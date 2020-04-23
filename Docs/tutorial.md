@@ -26,7 +26,7 @@ w zależności od tego na jakim etapie są konkretne taski.
 * W kolumnie __Open__ znadują się bardzo ogóle rzeczy, które są do zrobienia. 
 * W kolumnie __To Do__ znajdują się konkretne zadania do wykonania
 * W kolumnie __Doing__ są taski nad ktorym ktos obecnie pracuje
-* W kolumnie __To Review__ jak sama nazwa mówi
+* W kolumnie __To Review__ są ukończone taski, które czekają na sprawdzenie przez innych
 * W kolumnie __Closed__ taski zmergowane na developa, czyli dokonczone, sprawdzone i poprawione. 
 
 Zadania dodajemy do __To Do__ (i tylko tam) przyciskiem plusik. Następnie po wpisaniu nazwy klikamy __Submit issue__.  
@@ -37,27 +37,32 @@ Ustawiamy zatem __Frontend__/__Backend__ i jesteśmy zrobieni.
 Więcej o tworzeniu samego taska potem. 
 #### 3.1.2. Merge Request
 Tutaj znajdują się merge requesty. Nie tworzymy ich z tego panelu, ale o tym więcej przy pracy z taskiem. \
-Zadania są nazwane "WIP: Resolve \<nazwa zadania>" lub samo "Resolve \<nazwa zadania>"" gdy task został ukończony. \
+Zadania są nazwane "WIP: Resolve \<nazwa zadania>" lub samo "Resolve \<nazwa zadania>" gdy task został ukończony. \
 Po kliknięci w merge request widzimy ogólny panel tego requesta (a właściwie taska w trakcie pracy, o tym potem). \
 ![](SS/merge_request.png)
 W celu przejrzenia zmian i komentowania kodu wchodzimy w __Changes__ zaraz obok _Overview_ i _Commits_.
 Tutaj możemy obserwować zmiany i komentować dowolną linię kodu.
 ![](SS/changes.png)
-Po wpisaniu komentarza, aby zatwiedzić naszego merge requesta należy zaznaczyć __Mark as resolved__ 
-przy każdym komentarzu, bowiem inaczej możliwość ta jest zablokowana. U góry pokazuje się ilość wątków do wyjaśnienia.
+Jako developer po pojawieniu się komentarza, powinniśmy poprawić kod zgodnie z uwagami, wtedy osoba komentująca zaznacza __Mark as resolved__ 
+przy komentarzu. Bez tego możliwość mergowania jest zablokowana. U góry pokazuje się ilość wątków do wyjaśnienia.
 ![](SS/comment.png)
 Więcej o requestach potem.
 ## 3. Tworzenie lokalnego repozytorium
-Na początku musimy stworzyć lokalne repo z naszym projektem. W gitlabie wchodzimy w __Projecr overview__,
+Na początku musimy stworzyć lokalne repo z naszym projektem. W gitlabie wchodzimy w __Project overview__,
  klikamy niebieski przycisk __Clone__ i wybierany _Https_, kopiujemy i lądujemy w terminalu. 
  Dla ubuntu wpisujemy po prostu
  ```
-    ~/$ git checkout -b develop
+    ~/$ git clone <skopiowany adres https>
 ```
 W tym momencie teoretycznie powinno wszystko grać i lokalne repo powinno sie utworzyć. 
-Pewnie da się to zrobić przez nasze środowisko, co kto lubi.
-Jeśli nie planujemy commitować z środowiska, w terminalu musimy pamiętać tylko, że pushujemy tak:
+Da się to zrobić przez nasze środowisko, co kto lubi.
+Podstawowe komendy:
 ```
+    ~/$ git pull origin <nazwa brancha>
+    ~/$ git add .
+    ~/$ git commit 
+    ~/$ git checkout <nazwa brancha>                #gdy branch istnieje
+    ~/$ git checkout -b <nazwa brancha>             #gdy tworzymy dopiero brancha
     ~/$ git push origin <nazwa brancha>
 ```
 ## 4. Praca z taskami
@@ -83,7 +88,7 @@ Gdy uznamy że praca nad zadaniem jest skończona należy podjąć działania w 
 * Wchodzimy w [Merge Requests](https://gitlab.com/sasuke5055/python-project/-/merge_requests), otwieramy naszego taska.
 * Klikamy przycisk __Resolve WIP status__. Od tego momentu znika dopisek 'WIP:' przy nazwie Merge Requestów.
 * Przesuwamy płytkę naszego taska do kolumny __To Review__
-* Tutaj czekamy aż ktoś przejrzy nasz kod i wypisze ewentualne rzeczy do poprawienia. Dobrą praktyką jest to, 
+* Tutaj czekamy aż ktoś przejrzy nasz kod i wypisze ewentualne rzeczy do poprawienia. Wymagane jest, 
 aby był to ktoś inny niz piszący kod xD, a jeszcze lepszą to, żeby backa sprawdzała osoba z fronta i odwrotnie 
 (szczególnie że każdy z nas musi ogarnąć wszystko), najcudowniej będzie gdy każdego taska sprawdzą 2 osoby. 
 ### 4.3 Code review
@@ -97,10 +102,18 @@ Gdy otrzymamy łapkę w górę od wszystkich osób sprawdzających możemy mergo
 * Klikamy __Merge__ zaznaczając _Delete source branch_ oraz _Squash commits_ (jeśli ten drugi się pojawi) i gotowe.
 * W tym momencie płytka z naszym taskiem powinna sama przenieść się do kolumny __Closed__, 
 a nasz request wyląduje w zakładce __Merged__. 
-## 5 Podsumowanie
+## 5 Zadanie domowe
+* Zrób taska o nazwie "Learn gitlab \<twoje imie>"
+* Postępuj jak w punktach powyżej
+* W swoim środowisku pobierz brancha twojego taska
+* Stwórz plik \<twojeimie>.py w folderze Docs
+* Przesuwaj wszystkie płytki zgodnie z instrukcją
+* Zakomentuj swojego merge requesta
+* Resolve wszystkie wątki
+* Zmerguj na developa :)
+## 6 Podsumowanie
 Może to wszystko wydawać się lekko zagmatwane, a np tworzenie merge requestów przed tym jak w ogóle powstanie linia 
 kodu sprzeczne, ale po prostu w taki sposób (ale nie tylko taki) pracuje się na gitlabie z projektami, 
 myślę że warto się tego nauczyć. W razie wątpliwości i pytań śmiało, mogłem coś pomylić, zamieszać, sam ogarniam to 
-ledwo kilka godzin.\
-Miłej lektury :>
+ledwo kilka godzin.
 
