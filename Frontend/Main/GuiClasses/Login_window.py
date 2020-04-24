@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, uic
 import json
-
+from GuiClasses.Main_window import MainWindow
 
 class LoginWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -34,9 +34,8 @@ class LoginWindow(QtWidgets.QMainWindow):
 
         # login using username and password
         print(f"Login user {username} with password {password}")
-        print("Open new stage and than close this")
-        self.open_main_window()
         self.close()
+        self.open_main_window()
 
     def save_users_credentials(self, username, password):
         # Saves users credentials into json file
@@ -70,9 +69,8 @@ class LoginWindow(QtWidgets.QMainWindow):
         open("cred.entials", "w").close()
 
     def open_main_window(self):
-        # Open main window after login in
-        # todo: Open main window
-        print("There will open main window")
+        #open new window
+        self.ui = MainWindow()
 
     def validate_data(self, login, password):
         # Checks if login/password is not empty
