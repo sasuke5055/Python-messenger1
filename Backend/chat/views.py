@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from .models import User, Contact, Conversation, UserConversation
 import json
 from django.core import serializers
-from .serializers import ContactSerializer, UserSerializer, UserConversationSerializer
+from .serializers import ContactSerializer, UserSerializer, UserConversationSerializer, MessageSerializer
 
 def index(request):
     return render(request, 'chat/index.html')
@@ -27,9 +27,17 @@ class ConversationsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        print(request.user.conversations.all())
         conversations_data = []
         for conversation in request.user.conversations.all():
              conversations_data.append(UserConversation.objects.get(user=request.user, conversation=conversation))
         content = {'content': UserConversationSerializer(conversations_data, many=True).data}
+        return Response(content)
+
+
+class ConversationMessagesView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        conversation = Conversation.objects.get(id=pk)
+        content = {'content':MessageSerializer(conversation.get_last_messages(0,20), many=True).data}
         return Response(content)

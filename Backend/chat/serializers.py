@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Contact, User, UserConversation, Conversation
+from .models import Contact, User, UserConversation, Conversation, Message
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +20,9 @@ class UserConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserConversation
         fields = ['id', 'title', 'count_unread']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['content', 'timestamp', 'author']
