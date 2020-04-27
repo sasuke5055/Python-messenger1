@@ -43,8 +43,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_auth.registration',
     'rest_framework',
+    'rest_framework_docs',
     'rest_framework.authtoken',
-	'chat'
+    'drf_yasg',
+	'chat',
 ]
 
 REST_FRAMEWORK = {
