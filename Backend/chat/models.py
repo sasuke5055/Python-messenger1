@@ -19,7 +19,7 @@ class Conversation(models.Model):
         User, related_name='conversations', blank=True, through='UserConversation')
     is_private = models.BooleanField(default=True)
     title = models.CharField(max_length=1000)
-    #colors etc
+
 
     def __str__(self):
         return "{}".format(self.pk)
