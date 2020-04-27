@@ -22,11 +22,12 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
-    path('rest-auth/registration/', include('rest_auth.registration.urls')),
-    path('contacts/', views.ContactsView.as_view(), name='contacts'),
-    path('conversations/',views.ConversationsView.as_view(), name='conversations'),
+   path('', views.index, name='index'),
+   path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+   path('rest-auth/registration/', include('rest_auth.registration.urls')),
+   path('contacts/', views.ContactsView.as_view(), name='contacts'),
+   path('conversations/',views.ConversationsView.as_view(), name='conversations'),
+   path('<pk>/messages/', views.ConversationMessagesView.as_view(), name='messages'),
    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
