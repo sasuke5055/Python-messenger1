@@ -1,21 +1,32 @@
 from PyQt5 import QtWidgets, uic
 import json
 from GuiClasses.Main_window import MainWindow
+from GuiClasses.Forgot_password_window import ForgotWindow
+from GuiClasses.Register_window import RegisterWindow
+
 
 class LoginWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(LoginWindow, self).__init__()
         uic.loadUi('UiFiles/Login_window.ui', self)
 
+        self.initUi()
+
+        self.show()
+
+    def initUi(self):
         self.button_login = self.findChild(QtWidgets.QPushButton, 'button_login')
+        self.button_forgot = self.findChild(QtWidgets.QPushButton, 'button_forgot')
+        self.button_register = self.findChild(QtWidgets.QPushButton, 'button_register')
         self.lineEdit_username = self.findChild(QtWidgets.QLineEdit, 'lineEdit_username')
         self.lineEdit_password = self.findChild(QtWidgets.QLineEdit, 'lineEdit_password')
         self.checkBox_remember = self.findChild(QtWidgets.QCheckBox, 'checkBox_remember')
 
         self.button_login.pressed.connect(self.login_button_pressed)
-        self.load_users_credentials()
+        self.button_forgot.pressed.connect(self.forgot_button_pressed)
+        self.button_register.pressed.connect(self.register_button_pressed)
 
-        self.show()
+        self.load_users_credentials()
 
     def login_button_pressed(self):
         username = self.lineEdit_username.text()
@@ -36,6 +47,14 @@ class LoginWindow(QtWidgets.QMainWindow):
         print(f"Login user {username} with password {password}")
         self.close()
         self.open_main_window()
+
+    def forgot_button_pressed(self):
+        self.ui = ForgotWindow(self)
+        self.setDisabled(True)
+
+    def register_button_pressed(self):
+        self.ui = RegisterWindow(self)
+        self.setDisabled(True)
 
     def save_users_credentials(self, username, password):
         # Saves users credentials into json file

@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, uic
+from GuiClasses.Change_password_window import ChangePasswordWindow
 
 
 entries = ["Ania", "Asia", "Ala"]
@@ -6,15 +7,15 @@ messages = {"Ania": ["Ty: Mój stary to fanatyk wędkarstwa. Pół mieszkania za
 "Ala" : ["Ty: Hejka naklejka!"]}
 username = "Ty"
 def get_contacts():
-    "function made for testing purposes"
+    """function made for testing purposes"""
     return entries
 
 def get_messages(contact):
-    "return all messages between you and given contact"
+    """return all messages between you and given contact"""
     return messages[contact]
 
 def split_message(message, count=26):
-    "split words to have at maximum 'count' characters "
+    """split words to have at maximum 'count' characters """
     return_message = ''
     words = message.split(' ')
     for w in words:
@@ -33,24 +34,30 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_contact = None
         uic.loadUi('UiFiles/Main_window.ui', self)
 
+        self.initUi()
+
+        self.setup_contacts()
+        self.show()
+
+    def initUi(self):
         self.button_send_message = self.findChild(QtWidgets.QPushButton, 'button_send_message')
         self.button_send_message.clicked.connect(self.send_new_message)
         self.button_send_message.setStyleSheet(
-                                                  "QPushButton {"
-                                                  "  font-size: 11px;\n"
-                                                  "  text-align: center;\n"
-                                                  "  text-decoration: none;\n"
-                                                  "  outline: none;\n"
-                                                  "  color: black;\n"
-                                                  "  background-color: #008ae6;\n"
-                                                  "  border: none;\n"
-                                                  "  border-radius: 15px;\n"
-                                                  "  }\n"
-                                                  "QPushButton:hover { \n"
-                                                  "background-color: #1aa3ff\n"
-                                                  "}"
-                                                )
-        self.text_new_mssage = self.findChild(QtWidgets.QTextEdit, 'text_new_mssage')
+            "QPushButton {"
+            "  font-size: 11px;\n"
+            "  text-align: center;\n"
+            "  text-decoration: none;\n"
+            "  outline: none;\n"
+            "  color: black;\n"
+            "  background-color: #008ae6;\n"
+            "  border: none;\n"
+            "  border-radius: 15px;\n"
+            "  }\n"
+            "QPushButton:hover { \n"
+            "background-color: #1aa3ff\n"
+            "}"
+        )
+        self.text_new_message = self.findChild(QtWidgets.QTextEdit, 'text_new_message')
         self.centralwidget = self.findChild(QtWidgets.QWidget, 'centralwidget')
         self.list_contacts = self.findChild(QtWidgets.QListWidget, 'list_contacts')
         self.list_contacts.itemClicked.connect(self.show_messages)
@@ -58,11 +65,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_messages.setWordWrap(True)
         self.list_messages.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
 
-        
-        
-        
-        self.setup_contacts()
-        self.show()
+        # Menu setup
+        self.action_change_pass = self.findChild(QtWidgets.QAction, 'action_change_pass')
+        self.action_change_pass.triggered.connect(self.open_change_password_window)
+
     def setup_contacts(self):
         " show all contacs and groups of yours "
         for contact in get_contacts():
@@ -71,7 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.list_contacts.addItem(new_item)
                 
     def show_messages(self, item = None):
-        "show messages between you and given contact named 'item'" 
+        """show messages between you and given contact named 'item'"""
         self.list_messages.clear()
         contact = item.text() if item is not None else self.current_contact
         self.current_contact = contact
@@ -121,11 +127,15 @@ class MainWindow(QtWidgets.QMainWindow):
             self.list_messages.scrollToBottom()
 
     def send_new_message(self):
-        "send new message to contact. Usage: 'Ty: <message>' or '<contact_name>: <message>' for test purposes only"
+        """send new message to contact. Usage: 'Ty: <message>' or '<contact_name>: <message>' for test purposes only"""
         text = self.text_new_message.toPlainText()
         if len(text) != 0:     
             messages[self.current_contact].append(text)
             self.show_messages()
             self.text_new_message.clear()
+
+    def open_change_password_window(self):
+        self.ui = ChangePasswordWindow(self)
+        self.setDisabled(True)
 
     

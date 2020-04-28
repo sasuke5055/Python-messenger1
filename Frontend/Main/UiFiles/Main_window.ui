@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>741</width>
-    <height>655</height>
+    <width>880</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,9 +32,21 @@
      <rect>
       <x>170</x>
       <y>10</y>
-      <width>451</width>
-      <height>341</height>
+      <width>590</width>
+      <height>340</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>590</width>
+      <height>340</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>590</width>
+      <height>340</height>
+     </size>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -48,7 +60,7 @@
      <rect>
       <x>170</x>
       <y>370</y>
-      <width>451</width>
+      <width>591</width>
       <height>141</height>
      </rect>
     </property>
@@ -59,7 +71,7 @@
    <widget class="QPushButton" name="button_send_message">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>510</x>
       <y>520</y>
       <width>251</width>
       <height>71</height>
@@ -84,12 +96,30 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>741</width>
-     <height>21</height>
+     <width>880</width>
+     <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_profile">
+    <property name="title">
+     <string>Profil</string>
+    </property>
+    <addaction name="action_change_pass"/>
+    <addaction name="action_change_infos"/>
+   </widget>
+   <addaction name="menu_profile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_change_pass">
+   <property name="text">
+    <string>Zmiana hasła</string>
+   </property>
+  </action>
+  <action name="action_change_infos">
+   <property name="text">
+    <string>Zmiana danych</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
