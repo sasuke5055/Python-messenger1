@@ -2,10 +2,14 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
+from .utils import create_message
+from .models import Conversation
+
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.user = self.scope['user']
+        self.room_name = self.user.pk
         self.room_group_name = 'chat_%s' % self.room_name
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
@@ -23,21 +27,32 @@ class ChatConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message
-            }
-        )
+        content = text_data_json['content']
+        conversation_id = text_data_json['conversation_id']
+        conversation = Conversation.objects.get(pk=conversation_id)
+        message = create_message(self.user ,conversation, content)
+        for user in conversation.participants.all():
+            room_group_name = 'chat_%s' % user.pk
+            async_to_sync(self.channel_layer.group_send)(
+                room_group_name,
+                {
+                    'type': 'notify',
+                    'conversation_id': conversation_id
+                }
+            )
 
     # Receive message from room group
     def chat_message(self, event):
         message = event['message']
         async_to_sync(self.send(text_data=json.dumps({
             'message': message
+        })))
+    
+    def notify(self, event):
+        conversation_id = event['conversation_id']
+        async_to_sync(self.send(text_data=json.dumps({
+            'type': 'new_message',
+            'conversation_id': conversation_id
         })))
 
 # class ChatConsumer(AsyncWebsocketConsumer):

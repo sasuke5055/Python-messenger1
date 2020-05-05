@@ -22,7 +22,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-   path('', views.index, name='index'),
+   path('', views.room, name='room'),
    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
    path('rest-auth/registration/', include('rest_auth.registration.urls')),
    path('contacts/', views.ContactsView.as_view(), name='contacts'),
