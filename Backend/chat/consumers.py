@@ -3,7 +3,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
 from .utils import create_message
-from .models import Conversation
+from .models import Conversation, UserConversation
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -27,19 +27,44 @@ class ChatConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        content = text_data_json['content']
-        conversation_id = text_data_json['conversation_id']
-        conversation = Conversation.objects.get(pk=conversation_id)
-        message = create_message(self.user ,conversation, content)
-        for user in conversation.participants.all():
-            room_group_name = 'chat_%s' % user.pk
-            async_to_sync(self.channel_layer.group_send)(
-                room_group_name,
-                {
-                    'type': 'notify',
-                    'conversation_id': conversation_id
-                }
-            )
+        type = text_data_json['type']
+        if type == 'message':
+            content = text_data_json['content']
+            conversation_id = text_data_json['conversation_id']
+            conversation = Conversation.objects.get(pk=conversation_id)
+            print(self.user, conversation, content)
+            message = create_message(self.user ,conversation, content)
+            author = self.user.pk
+            for user in conversation.participants.all():
+                userConversation = UserConversation.objects.get(user=user, conversation=conversation)
+                if userConversation.is_listening:
+                    room_group_name = 'chat_%s' % user.pk
+                    async_to_sync(self.channel_layer.group_send)(
+                        room_group_name,
+                        {
+                            'type': 'message',
+                            'conversation_id': conversation_id,
+                            'author': author,
+                            'timestamp': str(message.timestamp),
+                            'content': content
+                        }
+                    )
+                else:
+                    room_group_name = 'chat_%s' % user.pk
+                    async_to_sync(self.channel_layer.group_send)(
+                        room_group_name,
+                        {
+                            'type': 'notify',
+                            'conversation_id': conversation_id
+                        }
+                    )
+        elif type == 'join_conversation':
+            conversation_id = text_data_json['conversation_id']
+            conversation = Conversation.objects.get(pk = conversation_id)
+            userConversation = UserConversation.objects.get(user=self.user, conversation=conversation)
+            userConversation.is_listening = not userConversation.is_listening
+            userConversation.save()
+            #TODO - add close convesation
 
     # Receive message from room group
     def chat_message(self, event):
@@ -51,8 +76,21 @@ class ChatConsumer(WebsocketConsumer):
     def notify(self, event):
         conversation_id = event['conversation_id']
         async_to_sync(self.send(text_data=json.dumps({
-            'type': 'new_message',
+            'type': 'new_notification',
             'conversation_id': conversation_id
+        })))
+    
+    def message(self, event):
+        content = event['content']
+        conversation_id = event['conversation_id']
+        author = event['author']
+        timestamp = event['timestamp']
+        async_to_sync(self.send(text_data=json.dumps({
+            'type': 'new_message',
+            'conversation_id': conversation_id,
+            'author': author,
+            'timestamp': timestamp,
+            'content': content
         })))
 
 # class ChatConsumer(AsyncWebsocketConsumer):

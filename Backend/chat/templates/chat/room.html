@@ -8,7 +8,9 @@
 <body>
     <textarea id="chat-log" cols="100" rows="20"></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
+    <input id="chat-message-submit" type="button" value="Send"><br>
+    <input id="chat-message-conversation-id" type="text" size="100"><br>
+    <input id="chat-message-conversation-id-submit" type="button" value="Join"><br>
     {{ room_name|json_script:"room-name" }}
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
@@ -23,7 +25,14 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.conversation_id + '\n');
+            if (data.type == 'new_notification')
+            {
+                document.querySelector('#chat-log').value += 'new message in: ' + (data.conversation_id + '\n');
+            }
+            else if (data.type == 'new_message')
+            {
+                document.querySelector('#chat-log').value += 'author: ' + data.author + ' timestamp: ' + data.timestamp + ' new message: ' + (data.content + '\n');
+            }
         };
 
         chatSocket.onclose = function(e) {
@@ -40,11 +49,23 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
+            const conversationInputDom = document.querySelector('#chat-message-conversation-id');
+            const conversation_id = conversationInputDom.value;
             chatSocket.send(JSON.stringify({
+                'type': 'message',
                 'content': message,
-                'conversation_id': 1
+                'conversation_id': conversation_id
             }));
             messageInputDom.value = '';
+        };
+
+        document.querySelector('#chat-message-conversation-id-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-conversation-id');
+            const conversation_id = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'type': 'join_conversation',
+                'conversation_id': conversation_id
+            }));
         };
     </script>
 </body>
