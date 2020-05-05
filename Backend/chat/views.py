@@ -10,9 +10,9 @@ from .serializers import ContactSerializer, UserSerializer, UserConversationSeri
 def index(request):
     return render(request, 'chat/index.html')
 
-def room(request, room_name):
+def room(request):
     return render(request, 'chat/room.html', {
-        'room_name': room_name
+        
     })
 
 class ContactsView(APIView):
