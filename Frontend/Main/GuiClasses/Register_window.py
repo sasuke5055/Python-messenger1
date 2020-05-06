@@ -2,7 +2,9 @@ from PyQt5 import QtWidgets, uic, Qt
 from PyQt5.QtWidgets import QDialog, QTextEdit, QVBoxLayout, QLabel, QPushButton, QMessageBox
 from SidePackage.Validation import validate_email, validate_password
 from SidePackage.Error import pop_alert
-
+import urllib.request
+import urllib.parse
+import requests
 
 class RegisterWindow(QtWidgets.QMainWindow):
     def __init__(self, LoginWindow):
@@ -66,7 +68,7 @@ class RegisterWindow(QtWidgets.QMainWindow):
             self.lineEdit_email2.setText("")
             pop_alert("Podaj poprawne adres email")
             return
-
+        
         self.send_request_to_server()
         # Todo: Czekaj na odpowiedź od serwera i wyrzuć powodzenie lub niepowodzenie
         self.close()
@@ -93,3 +95,6 @@ class RegisterWindow(QtWidgets.QMainWindow):
         last_name = self.lineEdit_sname.text()
         email = self.lineEdit_sname.text()
         print(f"Wysyłam zapytanie o rejstrację z danymi: login={login}, haslo={password}, imie={first_name}, nazwisko:{last_name}, mail:{email}")
+        url = 'http://127.0.0.1:8000/chat/rest-auth/registration/'
+        payload = {'username': login, 'password1': password, 'password2': password}
+        r = requests.post(url, data=payload)
