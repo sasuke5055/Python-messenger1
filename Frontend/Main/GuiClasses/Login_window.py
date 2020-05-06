@@ -3,7 +3,7 @@ import json
 from GuiClasses.Main_window import MainWindow
 from GuiClasses.Forgot_password_window import ForgotWindow
 from GuiClasses.Register_window import RegisterWindow
-
+import requests
 
 class LoginWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -45,6 +45,13 @@ class LoginWindow(QtWidgets.QMainWindow):
 
         # login using username and password
         print(f"Login user {username} with password {password}")
+        # TODO
+        url = 'http://127.0.0.1:8000/chat/api-token-auth/'
+        payload = {'username': username, 'password': password}
+        r = requests.post(url, data=payload)
+        print(r.status_code)
+        if r.status_code == 200:
+            print(r.text)
         self.close()
         self.open_main_window()
 
