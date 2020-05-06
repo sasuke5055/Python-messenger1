@@ -6,6 +6,8 @@ from .models import User, Contact, Conversation, UserConversation
 import json
 from django.core import serializers
 from .serializers import ContactSerializer, UserSerializer, UserConversationSerializer, MessageSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 def index(request):
     return render(request, 'chat/index.html')
@@ -41,3 +43,9 @@ class ConversationMessagesView(APIView):
         conversation = Conversation.objects.get(id=pk)
         content = {'content':MessageSerializer(conversation.get_last_messages(0,20), many=True).data}
         return Response(content)
+
+class CustomObtainAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response({'token': token.key, 'id': token.user_id})
