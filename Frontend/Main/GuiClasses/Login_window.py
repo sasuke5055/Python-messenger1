@@ -3,6 +3,8 @@ import json
 from GuiClasses.Main_window import MainWindow
 from GuiClasses.Forgot_password_window import ForgotWindow
 from GuiClasses.Register_window import RegisterWindow
+from SidePackage.Error import pop_alert
+
 import requests
 
 class LoginWindow(QtWidgets.QMainWindow):
@@ -51,9 +53,10 @@ class LoginWindow(QtWidgets.QMainWindow):
         r = requests.post(url, data=payload)
         print(r.status_code)
         if r.status_code == 200:
-            print(r.text)
-        self.close()
-        self.open_main_window()
+            self.close()
+            self.open_main_window(r.json()["token"])
+        else:
+            pop_alert("Niepoprawne dane logowania!")
 
     def forgot_button_pressed(self):
         self.ui = ForgotWindow(self)
@@ -94,9 +97,9 @@ class LoginWindow(QtWidgets.QMainWindow):
         # Empty the file with credentials
         open("cred.entials", "w").close()
 
-    def open_main_window(self):
+    def open_main_window(self, token_id):
         #open new window
-        self.ui = MainWindow()
+        self.ui = MainWindow(token_id)
 
     def validate_data(self, login, password):
         # Checks if login/password is not empty
