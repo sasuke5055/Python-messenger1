@@ -14,5 +14,9 @@ def create_message(author, conversation, content):
     print(e)
     return None
   
-  
+def add_user_to_conversation(user, conversation):
+  conversation.participants.add(user)
+  user_conversation = UserConversation.objects.get_or_create(user=user, conversation=conversation)
+  conversation.save()
+  return user_conversation[0]
 

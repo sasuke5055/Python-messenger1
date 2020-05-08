@@ -23,7 +23,7 @@ class Conversation(models.Model):
 
 
     def __str__(self):
-        return "{}".format(self.pk)
+        return "{}: {}".format(self.pk, self.title)
 
     def get_last_messages(self, start, count):
         return self.messages.order_by('-timestamp').all()[start:start+count]
@@ -42,9 +42,11 @@ class Message(models.Model):
 
 
     def __str__(self):
-        return self.author.username
+        return "author:{}, conversation: {}, id: {}".format(self.author.username, self.conversation, self.pk)
 
 class UserConversation(models.Model):
+    readonly_fields = ('last_read_timestamp',)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
 
@@ -62,6 +64,9 @@ class UserConversation(models.Model):
 
     def title(self):
         return self.conversation.title
+
+    def __str__(self):
+        return "{} conversation: {}".format(self.user, self.conversation)
 
 
 
