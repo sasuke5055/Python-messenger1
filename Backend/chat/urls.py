@@ -27,7 +27,7 @@ urlpatterns = [
    path('rest-auth/registration/', include('rest_auth.registration.urls')),
    path('contacts/', views.ContactsView.as_view(), name='contacts'),
    path('conversations/',views.ConversationsView.as_view(), name='conversations'),
-   path('<pk>/messages/', views.ConversationMessagesView.as_view(), name='messages'),
+   path('messages/<pk>', views.ConversationMessagesView.as_view(), name='messages'),
    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

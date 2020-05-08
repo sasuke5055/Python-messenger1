@@ -5,7 +5,7 @@ import json
 
 entries = ["Ania", "Asia", "Ala"]
 messages = {"test": ["Ty: Mój stary to fanatyk wędkarstwa. Pół mieszkania zajebane wędkami najgorsze. Średnio raz w miesiącu ktoś wdepnie w leżący na ziemi haczyk czy kotwicę i trzeba wyciągać w szpitalu bo mają zadziory na końcu. W swoim 22 letnim życiu już z 10 razy byłem na takim zabiegu. Tydzień temu poszedłem na jakieś losowe badania to baba z recepcji jak mnie tylko zobaczyła to kazała buta ściągać xD bo myślała, że znowu hak w nodze. Druga połowa mieszkania zajebana Wędkarzem Polskim, Światem Wędkarza, Super Karpiem xD itp. Co tydzień ojciec robi objazd po wszystkich kioskach w mieście, żeby skompletować wszystkie wędkarskie tygodniki. Byłem na tyle głupi, że nauczyłem go into internety bo myślałem, że trochę pieniędzy zaoszczędzimy na tych gazetkach ale teraz nie dosyć, że je kupuje to jeszcze siedzi na jakichś forach dla wędkarzy i kręci gównoburze z innymi wędkarzami o najlepsze zanęty itp. Potrafi drzeć mordę do monitora albo wypierdolić klawiaturę za okno. Kiedyś ojciec mnie wkurwił to założyłem tam konto i go trolowałem pisząc w jego tematach jakieś losowe głupoty typu karasie jedzo guwno. Matka nie nadążała z gotowaniem bigosu na uspokojenie. Aha, ma już na forum rangę SUM, za najebanie 10k postów.Jak jest ciepło to co weekend zapierdala na ryby. Od jakichś 5 lat w każdą niedzielę jem rybę na obiad a ojciec pierdoli o zaletach jedzenia tego wodnego gówna. Jak się dostałem na studia to stary przez tydzień pie**olił że to dzięki temu, że jem dużo ryb bo zawierają fosfor i mózg mi lepiej pracuje.Co sobotę budzi ze swoim znajomym mirkiem całą rodzinę o 4 w nocy bo hałasują pakując wędki, robiąc kanapki itd.Przy jedzeniu zawsze pierdoli o rybach i za każdym razem temat schodzi w końcu na Polski Związek Wędkarski, ojciec sam się nakręca i dostaje strasznego bólu dupy durr niedostatecznie zarybiajo tylko kradno hurr, robi się przy tym cały czerwony i odchodzi od stołu klnąc i idzie czytać Wielką Encyklopedię Ryb Rzecznych żeby się uspokoić.W tym roku sam sobie kupił na święta ponton. Oczywiście do wigilii nie wytrzymał tylko już wczoraj go rozpakował i nadmuchał w dużym pokoju. Ubrał się w ten swój cały strój wędkarski i siedział cały dzień w tym pontonie na środku mieszkania. Obiad (karp) też w nim zjadł [cool][cześć]  ", "Ty: Cześć", "Ania: Co tam?", "Ty: HIPOPOTAM XDXDXD", "Ty: Jestem super"], "Asia" : ["Asia: hallooo", "Ty: eloo"], 
-"Ala" : ["Ty: Hejka naklejka!"]}
+"Ala" : ["Ty: Hejka naklejka!"], "Rozmowa prywatna" : [], "druga rozmowa" : []}
 username = "Ty"
 
 
@@ -25,9 +25,10 @@ def split_message(message, count=26):
     return return_message
 
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, token_id):
+    def __init__(self, token_id, user_id):
         super(MainWindow, self).__init__()
         self.token_id = token_id
+        self.user_id = user_id
         self.conversation_ids = dict()
         print(token_id)
         self.current_contact = None
@@ -140,25 +141,32 @@ class MainWindow(QtWidgets.QMainWindow):
         url = 'http://127.0.0.1:8000/chat/conversations/'
         headers = {'Authorization': 'Token '+self.token_id}
         r = requests.get(url, headers=headers)
-        print(r.json()['content'][0]['title'])
         e = []
-        for x in r.json()['content']:
+        data = r.json()['content']
+        for x in data:
             self.conversation_ids[x['title']] = x['id']
             e.append(x['title'])
         print(self.conversation_ids)
 
         return e
     def get_messages(self, contact):
-        url = 'http://127.0.0.1:8000/chat/'+str(self.conversation_ids[contact])+'/messages/'
+        url = 'http://127.0.0.1:8000/chat/messages/'+str(self.conversation_ids[contact])
         headers = {'Authorization': 'Token '+self.token_id}
         r = requests.get(url, headers=headers)
         d = list()
-        for c in r.json()['content']:
-            if c['author'] == 2:
-                 messages[contact].append( "Ty: "+m ) 
+        data = r.json()['content']
+        messages[contact] = []
+        for message in data:
+            content = message['content']
+            author_id = message['author']['id']
+            if author_id == self.user_id:
+                message_prefix = "Ty: "
             else:
-                messages[contact].append( "Pawel: " + c['content'] ) 
-            d.append((c['author'],c['content']))
+                author_name = message['author']['username']
+                message_prefix = author_name + ": "
+
+            messages[contact].append(message_prefix + content) 
+            d.append((author_id, content))
         """return all messages between you and given contact"""
         messages[contact].reverse()
         return messages[contact]

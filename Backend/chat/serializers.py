@@ -17,12 +17,17 @@ class ContactSerializer(serializers.ModelSerializer):
 
 
 class UserConversationSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField('get_conversation_id')
     class Meta:
         model = UserConversation
         fields = ['id', 'title', 'count_unread']
 
+    def get_conversation_id(self, obj):
+        return obj.conversation.pk
+
 
 class MessageSerializer(serializers.ModelSerializer):
+    author = UserSerializer()
     class Meta:
         model = Message
         fields = ['content', 'timestamp', 'author']

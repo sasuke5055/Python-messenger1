@@ -54,7 +54,10 @@ class LoginWindow(QtWidgets.QMainWindow):
         print(r.status_code)
         if r.status_code == 200:
             self.close()
-            self.open_main_window(r.json()["token"])
+            data = r.json()
+            token = data["token"]
+            user_id = data["user_id"]
+            self.open_main_window(token, user_id)
         else:
             pop_alert("Niepoprawne dane logowania!")
 
@@ -97,9 +100,9 @@ class LoginWindow(QtWidgets.QMainWindow):
         # Empty the file with credentials
         open("cred.entials", "w").close()
 
-    def open_main_window(self, token_id):
+    def open_main_window(self, token_id, user_id):
         #open new window
-        self.ui = MainWindow(token_id)
+        self.ui = MainWindow(token_id, user_id)
 
     def validate_data(self, login, password):
         # Checks if login/password is not empty
