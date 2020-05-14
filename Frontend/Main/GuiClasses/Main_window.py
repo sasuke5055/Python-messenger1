@@ -28,12 +28,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, token_id, user_id):
         super(MainWindow, self).__init__()
         self.token_id = token_id
+        print(token_id)
         self.user_id = user_id
         self.conversation_ids = dict()
         print(token_id)
         self.current_contact = None
         uic.loadUi('UiFiles/Main_window.ui', self)
-
+        self.conversation_list = []
         self.initUi()
 
         self.setup_contacts()
@@ -78,10 +79,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 
     def show_messages(self, item = None):
         """show messages between you and given contact named 'item'"""
+        print()
         self.list_messages.clear()
         contact = item.text() if item is not None else self.current_contact
         self.current_contact = contact
-        contact_messages = self.get_messages(contact)
+        contact_messages = self.get_messages()
         for message_info in contact_messages:
             sender = message_info.split(':')[0]
             message = message_info[len(sender)+2:]
@@ -144,18 +146,22 @@ class MainWindow(QtWidgets.QMainWindow):
         e = []
         data = r.json()['content']
         for x in data:
-            self.conversation_ids[x['title']] = x['id']
+            self.conversation_list.append(x)
+            # self.conversation_ids[x['title']] = x['id']
             e.append(x['title'])
         print(self.conversation_ids)
-
         return e
-    def get_messages(self, contact):
-        url = 'http://127.0.0.1:8000/chat/messages/'+str(self.conversation_ids[contact])
+
+    def get_messages(self):
+        contact = self.conversation_list[self.list_contacts.currentRow()]
+        print(contact['id'])
+        
+        url = 'http://127.0.0.1:8000/chat/messages/'+str(contact['id'])
         headers = {'Authorization': 'Token '+self.token_id}
         r = requests.get(url, headers=headers)
         d = list()
         data = r.json()['content']
-        messages[contact] = []
+        messages[contact['id']] = []
         for message in data:
             content = message['content']
             author_id = message['author']['id']
@@ -165,11 +171,59 @@ class MainWindow(QtWidgets.QMainWindow):
                 author_name = message['author']['username']
                 message_prefix = author_name + ": "
 
-            messages[contact].append(message_prefix + content) 
+            messages[contact['id']].append(message_prefix + content) 
             d.append((author_id, content))
         """return all messages between you and given contact"""
-        messages[contact].reverse()
-        return messages[contact]
+        messages[contact['id']].reverse()
+        return messages[contact['id']]
 
 
     
+class ListenWebsocket(QtCore.QThread):
+    def __init__(self, parent=None, conversation_name):
+
+        super(ListenWebsocket, self).__init__(parent)
+
+        websocket.enableTrace(True)
+
+        self.WS = websocket.WebSocketApp(f"ws://localhost:8080/chat/{conversation_name}",
+                                on_message = self.on_message,
+                                on_error = self.on_error,
+                                on_close = self.on_close) 
+
+    def run(self):
+        #ws.on_open = on_open
+
+        self.WS.run_forever()
+
+ if (data.type == 'new_notification')
+            {
+                document.querySelector('#chat-log').value += 'new message in: ' + (data.conversation_id + '\n');
+            }
+            else if (data.type == 'new_message')
+            {
+                document.querySelector('#chat-log').value += 'author: ' + data.author + ' timestamp: ' + data.timestamp + ' new message: ' + (data.content + '\n');
+            }
+
+
+    def on_message(self, data):
+        if data.type == 'new_notification':
+            print("new massage in: " + ())
+
+        elif data.type == 'new_message':
+            
+
+    def on_error(self, ws, error):
+        print error
+
+    def on_close(self, ws):
+        print "### closed ###"
+
+    document.querySelector('#chat-message-conversation-id-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-conversation-id');
+            const conversation_id = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'type': 'join_conversation',
+                'conversation_id': conversation_id
+            }));
+        };
