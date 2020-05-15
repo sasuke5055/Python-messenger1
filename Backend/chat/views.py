@@ -21,28 +21,42 @@ class ContactsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        content = {'content': ContactSerializer(request.user.contact.get()).data}
-        return Response(content)
+        if request.user.is_authenticated:
+            content = {'content': ContactSerializer(request.user.contact.get()).data}
+            return Response(content)
+        else:
+            print("contacts view auth")
+            return Response(None)
 
 
 class ConversationsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        conversations_data = []
-        for conversation in request.user.conversations.all():
-             conversations_data.append(UserConversation.objects.get(user=request.user, conversation=conversation))
-        content = {'content': UserConversationSerializer(conversations_data, many=True).data}
-        return Response(content)
+        if request.user.is_authenticated:
+            conversations_data = []
+            for conversation in request.user.conversations.all():
+                conversations_data.append(UserConversation.objects.get(user=request.user, conversation=conversation))
+            content = {'content': UserConversationSerializer(conversations_data, many=True).data}
+            return Response(content)
+        else:
+            print("conversation view auth")
+            return Response(None)
 
 
 class ConversationMessagesView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
-        conversation = Conversation.objects.get(id=pk)
-        content = {'content':MessageSerializer(conversation.get_last_messages(0,20), many=True).data}
-        return Response(content)
+        print(request.user.username)
+        print(request.user.is_authenticated)
+        if request.user.is_authenticated:
+            conversation = Conversation.objects.get(id=pk)
+            content = {'content':MessageSerializer(conversation.get_last_messages(0,20), many=True).data}
+            return Response(content)
+        else:
+            print("słabooooo")
+            return Response(None)
 
 class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):

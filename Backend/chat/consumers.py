@@ -4,11 +4,15 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
 from .utils import create_message
 from .models import Conversation, UserConversation
-
+from django.contrib.auth import SESSION_KEY, get_user_model
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
+        # print(_get_user_session_key(self.scope['session']))
+        print(self.scope)
         self.user = self.scope['user']
+        print("XDDDDDDDDDDDDDDDDDDDDDD")
+        print(self.user.is_authenticated)
         self.room_name = self.user.pk
         self.room_group_name = 'chat_%s' % self.room_name
         async_to_sync(self.channel_layer.group_add)(
@@ -26,8 +30,12 @@ class ChatConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     def receive(self, text_data):
+        print(text_data)
+
         text_data_json = json.loads(text_data)
         type = text_data_json['type']
+        print(type)
+        print("cokolwiek")
         if type == 'message':
             content = text_data_json['content']
             conversation_id = text_data_json['conversation_id']
@@ -59,11 +67,18 @@ class ChatConsumer(WebsocketConsumer):
                         }
                     )
         elif type == 'join_conversation':
+            print("aaaaaaaaaaaaa")
             conversation_id = text_data_json['conversation_id']
             conversation = Conversation.objects.get(pk = conversation_id)
+            print(conversation)
+            print(self.user.username)
+            print(self.user.is_authenticated)
             userConversation = UserConversation.objects.get(user=self.user, conversation=conversation)
+            print(userConversation)
             userConversation.is_listening = not userConversation.is_listening
+            print(userConversation.is_listening)
             userConversation.save()
+            
             #TODO - add close convesation
 
     # Receive message from room group
