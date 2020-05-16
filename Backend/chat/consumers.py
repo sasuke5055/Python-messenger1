@@ -4,13 +4,16 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
 from .utils import create_message
 from .models import Conversation, UserConversation
+from rest_framework.authtoken.models import Token
 
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.user = self.scope['user']
-        self.room_name = self.user.pk
-        self.room_group_name = 'chat_%s' % self.room_name
+        token_id = str(self.scope['headers'][-1][1]).split(' ')[-1][:-1]
+        token = Token.objects.get(pk=token_id)
+        self.user = token.user
+
+        self.room_group_name = 'chat_%s' % self.user.pk
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
@@ -25,9 +28,11 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     # Receive message from WebSocket
+    
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         type = text_data_json['type']
+        print('NEW MESSAGE, ', type)
         if type == 'message':
             content = text_data_json['content']
             conversation_id = text_data_json['conversation_id']
@@ -64,7 +69,7 @@ class ChatConsumer(WebsocketConsumer):
             userConversation = UserConversation.objects.get(user=self.user, conversation=conversation)
             userConversation.is_listening = not userConversation.is_listening
             userConversation.save()
-            #TODO - add close convesation
+            #TODO - add close conversation
 
     # Receive message from room group
     def chat_message(self, event):

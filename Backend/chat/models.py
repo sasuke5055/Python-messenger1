@@ -52,7 +52,7 @@ class UserConversation(models.Model):
 
     unread = models.BooleanField(default=False)
     last_read_timestamp = models.DateTimeField(auto_now_add=True)
-    is_listening = models.BooleanField(default=False)
+    is_listening = models.BooleanField(default=True)
 
     def get_unread(self):
         if not self.unread:
