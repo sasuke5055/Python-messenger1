@@ -1,9 +1,12 @@
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtCore
 from GuiClasses.Change_password_window import ChangePasswordWindow
 import requests
+from threading import Thread
 import json
+from GuiClasses.messaging import Messenger
 
 entries = ["Ania", "Asia", "Ala"]
+#TODO kluczami messages powinny być id konwersacji
 messages = {"test": ["Ty: Mój stary to fanatyk wędkarstwa. Pół mieszkania zajebane wędkami najgorsze. Średnio raz w miesiącu ktoś wdepnie w leżący na ziemi haczyk czy kotwicę i trzeba wyciągać w szpitalu bo mają zadziory na końcu. W swoim 22 letnim życiu już z 10 razy byłem na takim zabiegu. Tydzień temu poszedłem na jakieś losowe badania to baba z recepcji jak mnie tylko zobaczyła to kazała buta ściągać xD bo myślała, że znowu hak w nodze. Druga połowa mieszkania zajebana Wędkarzem Polskim, Światem Wędkarza, Super Karpiem xD itp. Co tydzień ojciec robi objazd po wszystkich kioskach w mieście, żeby skompletować wszystkie wędkarskie tygodniki. Byłem na tyle głupi, że nauczyłem go into internety bo myślałem, że trochę pieniędzy zaoszczędzimy na tych gazetkach ale teraz nie dosyć, że je kupuje to jeszcze siedzi na jakichś forach dla wędkarzy i kręci gównoburze z innymi wędkarzami o najlepsze zanęty itp. Potrafi drzeć mordę do monitora albo wypierdolić klawiaturę za okno. Kiedyś ojciec mnie wkurwił to założyłem tam konto i go trolowałem pisząc w jego tematach jakieś losowe głupoty typu karasie jedzo guwno. Matka nie nadążała z gotowaniem bigosu na uspokojenie. Aha, ma już na forum rangę SUM, za najebanie 10k postów.Jak jest ciepło to co weekend zapierdala na ryby. Od jakichś 5 lat w każdą niedzielę jem rybę na obiad a ojciec pierdoli o zaletach jedzenia tego wodnego gówna. Jak się dostałem na studia to stary przez tydzień pie**olił że to dzięki temu, że jem dużo ryb bo zawierają fosfor i mózg mi lepiej pracuje.Co sobotę budzi ze swoim znajomym mirkiem całą rodzinę o 4 w nocy bo hałasują pakując wędki, robiąc kanapki itd.Przy jedzeniu zawsze pierdoli o rybach i za każdym razem temat schodzi w końcu na Polski Związek Wędkarski, ojciec sam się nakręca i dostaje strasznego bólu dupy durr niedostatecznie zarybiajo tylko kradno hurr, robi się przy tym cały czerwony i odchodzi od stołu klnąc i idzie czytać Wielką Encyklopedię Ryb Rzecznych żeby się uspokoić.W tym roku sam sobie kupił na święta ponton. Oczywiście do wigilii nie wytrzymał tylko już wczoraj go rozpakował i nadmuchał w dużym pokoju. Ubrał się w ten swój cały strój wędkarski i siedział cały dzień w tym pontonie na środku mieszkania. Obiad (karp) też w nim zjadł [cool][cześć]  ", "Ty: Cześć", "Ania: Co tam?", "Ty: HIPOPOTAM XDXDXD", "Ty: Jestem super"], "Asia" : ["Asia: hallooo", "Ty: eloo"], 
 "Ala" : ["Ty: Hejka naklejka!"], "Rozmowa prywatna" : [], "druga rozmowa" : []}
 username = "Ty"
@@ -30,7 +33,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.token_id = token_id
         self.user_id = user_id
         self.conversation_ids = dict()
-        print(token_id)
+        self.initialised_conversations = []
+
+        self.connect_to_socket()
         self.current_contact = None
         uic.loadUi('UiFiles/Main_window.ui', self)
 
@@ -38,6 +43,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setup_contacts()
         self.show()
+
+    def connect_to_socket(self):
+        address = f"ws://127.0.0.1:8000/ws/chat/xd/"
+        self.messenger = Messenger()
+        self.messenger.subscribe_to_socket(address, self.token_id)
+        self.messenger.message_signal.connect(self.refresh_messages)
+        self.messenger.add_callback_new_message_received(self.append_new_message)
 
     def initUi(self):
         self.button_send_message = self.findChild(QtWidgets.QPushButton, 'button_send_message')
@@ -81,7 +93,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_messages.clear()
         contact = item.text() if item is not None else self.current_contact
         self.current_contact = contact
-        contact_messages = self.get_messages(contact)
+        if contact not in self.initialised_conversations:
+            print('CONTACT IS:', contact)
+            contact_messages = self.get_messages(contact)
+            self.initialised_conversations.append(contact)
+        contact_messages = messages.get(contact,[])
         for message_info in contact_messages:
             sender = message_info.split(':')[0]
             message = message_info[len(sender)+2:]
@@ -126,17 +142,24 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.list_messages.setItemWidget(item_widget,widget)
             self.list_messages.scrollToBottom()
 
+    @QtCore.pyqtSlot()
+    def refresh_messages(self):
+        print('I NEED TO REFRESH!')
+        self.show_messages()
+
     def send_new_message(self):
         """send new message to contact. Usage: 'Ty: <message>' or '<contact_name>: <message>' for test purposes only"""
         text = self.text_new_message.toPlainText()
         if len(text) != 0:     
-            messages[self.current_contact].append(text)
-            self.show_messages()
+            # messages[self.current_contact].append(text)
             self.text_new_message.clear()
+            conversation_id = self.conversation_ids[self.current_contact]
+            self.messenger.publish_message(text, conversation_id)
 
     def open_change_password_window(self):
         self.ui = ChangePasswordWindow(self)
         self.setDisabled(True)
+
     def get_contacts(self):
         url = 'http://127.0.0.1:8000/chat/conversations/'
         headers = {'Authorization': 'Token '+self.token_id}
@@ -150,12 +173,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         return e
     def get_messages(self, contact):
-        url = 'http://127.0.0.1:8000/chat/messages/'+str(self.conversation_ids[contact])
+        conversation_id = self.conversation_ids[contact]
+        url = 'http://127.0.0.1:8000/chat/messages/'+str(conversation_id)
         headers = {'Authorization': 'Token '+self.token_id}
         r = requests.get(url, headers=headers)
         d = list()
         data = r.json()['content']
-        messages[contact] = []
+        if contact not in messages:
+            messages[contact] = []
         for message in data:
             content = message['content']
             author_id = message['author']['id']
@@ -170,6 +195,34 @@ class MainWindow(QtWidgets.QMainWindow):
         """return all messages between you and given contact"""
         messages[contact].reverse()
         return messages[contact]
+
+    def append_new_message(self, message):
+        print('appending new message')
+        content = message['content']
+        author_id = int(message['author']['id'])
+        conversation_id = int(message['conversation_id'])
+        
+        contact = next((title for title, id in self.conversation_ids.items() if id == conversation_id), None)
+        if contact not in self.initialised_conversations:
+            return
+        print('OOOOOOOOOO', contact)
+        print(self.conversation_ids.items())
+
+        if author_id == self.user_id:
+            message_prefix = "Ty: "
+        else:
+            author_name = message['author']['username']
+            message_prefix = author_name + ": "
+
+        print(message_prefix)
+
+        messages[contact].append(message_prefix + content)
+
+        
+        
+
+
+
 
 
     
