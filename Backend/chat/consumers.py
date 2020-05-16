@@ -2,15 +2,30 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
+from .serializers import MessageSerializer
 from .utils import create_message
 from .models import Conversation, UserConversation
+from rest_framework.authtoken.models import Token
 
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.user = self.scope['user']
-        self.room_name = self.user.pk
-        self.room_group_name = 'chat_%s' % self.room_name
+        try:
+            headers = dict(self.scope['headers'])
+            if b'authorization' in headers:
+                token_name, token_key = headers[b'authorization'].decode().split()
+                if token_name == 'Token':
+                    token = Token.objects.get(key=token_key)
+                    self.scope['user'] = token.user
+                    self.user = token.user
+            
+            print('GITARA', self.user)
+        except Exception as e:
+            print(e)
+            self.user = self.scope['user']
+            print('PRZEGLADARKA', self.user)
+
+        self.room_group_name = 'chat_%s' % self.user.pk
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
@@ -39,15 +54,13 @@ class ChatConsumer(WebsocketConsumer):
                 userConversation = UserConversation.objects.get(user=user, conversation=conversation)
                 if userConversation.is_listening:
                     room_group_name = 'chat_%s' % user.pk
+                    output_dict = MessageSerializer(message).data
+                    output_dict['conversation_id'] = conversation_id
+                    output_dict['type'] = 'message'
+
                     async_to_sync(self.channel_layer.group_send)(
                         room_group_name,
-                        {
-                            'type': 'message',
-                            'conversation_id': conversation_id,
-                            'author': author,
-                            'timestamp': str(message.timestamp),
-                            'content': content
-                        }
+                        output_dict
                     )
                 else:
                     room_group_name = 'chat_%s' % user.pk
