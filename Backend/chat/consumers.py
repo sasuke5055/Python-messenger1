@@ -30,6 +30,8 @@ class ChatConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     
     def receive(self, text_data):
+        print(text_data)
+
         text_data_json = json.loads(text_data)
         type = text_data_json['type']
         print('NEW MESSAGE, ', type)
@@ -64,10 +66,16 @@ class ChatConsumer(WebsocketConsumer):
                         }
                     )
         elif type == 'join_conversation':
+            print("aaaaaaaaaaaaa")
             conversation_id = text_data_json['conversation_id']
             conversation = Conversation.objects.get(pk = conversation_id)
+            print(conversation)
+            print(self.user.username)
+            print(self.user.is_authenticated)
             userConversation = UserConversation.objects.get(user=self.user, conversation=conversation)
+            print(userConversation)
             userConversation.is_listening = not userConversation.is_listening
+            print(userConversation.is_listening)
             userConversation.save()
             #TODO - add close conversation
 
