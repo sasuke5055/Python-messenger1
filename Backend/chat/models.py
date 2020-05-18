@@ -20,6 +20,7 @@ class Conversation(models.Model):
         User, related_name='conversations', blank=True, through='UserConversation')
     is_private = models.BooleanField(default=True)
     title = models.CharField(max_length=1000)
+    admin = models.ForeignKey(User, default=None, null=True,on_delete=models.CASCADE)
 
 
     def __str__(self):
