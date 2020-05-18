@@ -101,7 +101,6 @@ class LoginWindow(QtWidgets.QMainWindow):
         open("cred.entials", "w").close()
 
     def open_main_window(self, token_id, user_id):
-        print('Opening main window')
         #open new window
         self.ui = MainWindow(token_id, user_id)
 
