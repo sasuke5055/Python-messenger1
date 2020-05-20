@@ -25,7 +25,7 @@ SECRET_KEY = 'vm8-^(e38wg1vr@yd(9^te0%zh=sn#4a)(74m6n4uwfixnthta'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'rest_framework_docs',
     'rest_framework.authtoken',
     'drf_yasg',
-	'chat',
+    'chat',
+    'django_createsuperuserwithpassword',
+
 ]
 
 REST_FRAMEWORK = {
@@ -93,9 +95,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'messenger',
-		'USER': 'root',
+		'USER': 'dzik',
 		'PASSWORD': 'haslo1',
-		'HOST':'localhost',
+		'HOST':'mysql',
+        'PORT': 3306,
     }
 }
 
@@ -103,7 +106,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('redis', 6379)],
         },
     },
 }
@@ -148,3 +151,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 SITE_ID = 1
+

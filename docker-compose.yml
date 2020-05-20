@@ -1,0 +1,43 @@
+version: '3'
+services:
+  server:
+    build:
+      context: './Backend'
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    container_name: dzikbookserwer
+    volumes:
+        - ./Backend:/Backend
+    depends_on:
+      - mysql
+      - redis
+    links:
+      - mysql
+      - redis
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'messenger'
+      MYSQL_USER: 'dzik'
+      MYSQL_PASSWORD: 'haslo1'
+      MYSQL_ROOT_PASSWORD: 'nieLogujeSieRootemNigdy'
+    ports:
+      - '3307:3306'
+    expose:
+      - '3307'
+    volumes:
+      - db:/val/lib/mysql
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/config/redis.conf:/redis.conf
+    command: [ "redis-server", "/redis.conf" ]
+
+volumes:
+  db:

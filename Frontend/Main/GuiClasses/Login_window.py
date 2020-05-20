@@ -8,9 +8,11 @@ from SidePackage.Error import pop_alert
 import requests
 
 class LoginWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, URLs):
         super(LoginWindow, self).__init__()
         uic.loadUi('UiFiles/Login_window.ui', self)
+        self.URLs = URLs
+        print(URLs)
 
         self.initUi()
 
@@ -47,8 +49,10 @@ class LoginWindow(QtWidgets.QMainWindow):
 
         # login using username and password
         print(f"Login user {username} with password {password}")
-        # TODO
-        url = 'http://127.0.0.1:8000/chat/api-token-auth/'
+
+        #try for present server
+        # try:
+        url = self.URLs[0] + '/chat/api-token-auth/'
         payload = {'username': username, 'password': password}
         r = requests.post(url, data=payload)
         print(r.status_code)
@@ -60,6 +64,10 @@ class LoginWindow(QtWidgets.QMainWindow):
             self.open_main_window(token, user_id)
         else:
             pop_alert("Niepoprawne dane logowania!")
+        #except:
+        #    # Todo okienko z bledem sieci
+        #    print("Błąd serwera")
+        #    pop_alert("Błąd sieci, sprawdź połączenie.")
 
     def forgot_button_pressed(self):
         self.ui = ForgotWindow(self)
@@ -103,7 +111,7 @@ class LoginWindow(QtWidgets.QMainWindow):
     def open_main_window(self, token_id, user_id):
         print('Opening main window')
         #open new window
-        self.ui = MainWindow(token_id, user_id)
+        self.ui = MainWindow(token_id, user_id, self.URLs)
 
     def validate_data(self, login, password):
         # Checks if login/password is not empty
