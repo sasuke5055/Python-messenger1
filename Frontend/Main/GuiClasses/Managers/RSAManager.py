@@ -1,7 +1,7 @@
 import rsa
 import base64
 
-encoding = 'ISO-8859-1'
+encoding = 'utf-8'
 
 class RSAManager():
     def __init__(self, rsa_dict):
@@ -16,12 +16,15 @@ class RSAManager():
 
     def encrypt(self, message):
         message = message.encode(encoding)
-        encrypted_message = rsa.encrypt(message, self.pub_key).decode(encoding)
+        encrypted_message = rsa.encrypt(message, self.pub_key)
+        encrypted_message = base64.b64encode(encrypted_message)
+        encrypted_message = encrypted_message.decode(encoding)
         return encrypted_message
     
     def decrypt(self, message):
         try:
             encoded_message = message.encode(encoding)
+            encoded_message = base64.b64decode(message)
             decrypted_message = rsa.decrypt(encoded_message, self.priv_key)
             decrypted_message = decrypted_message.decode(encoding)
             return decrypted_message
