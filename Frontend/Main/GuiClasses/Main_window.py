@@ -29,10 +29,11 @@ def split_message(message, count=26):
     return return_message
 
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, token_id, user_id):
+    def __init__(self, token_id, user_id, URLs):
         super(MainWindow, self).__init__()
         self.token_id = token_id
         self.user_id = user_id
+        self.URLs = URLs
         self.conversation_ids = dict()
         self.initialised_conversations = []
 
@@ -48,7 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def connect_to_socket(self):
-        address = f"ws://127.0.0.1:8000/ws/chat/xd/"
+        address = self.URLs[1] + "/ws/chat/xd/"
         self.messenger = Messenger()
         self.messenger.subscribe_to_socket(address, self.token_id)
         self.messenger.message_signal.connect(self.refresh_messages)
@@ -223,11 +224,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.messenger.publish_message(text, conversation_id)
 
     def open_change_password_window(self):
-        self.ui = ChangePasswordWindow(self)
+        self.ui = ChangePasswordWindow(self, self.URLs)
         self.setDisabled(True)
 
     def get_contacts(self):
-        url = 'http://127.0.0.1:8000/chat/conversations/'
+        url = self.URLs[0] + '/chat/conversations/'
         headers = {'Authorization': 'Token '+self.token_id}
         r = requests.get(url, headers=headers)
         e = []
@@ -242,7 +243,7 @@ class MainWindow(QtWidgets.QMainWindow):
         conversation_id = self.conversation_ids[contact]
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
 
-        url = 'http://127.0.0.1:8000/chat/messages/'+str(conversation_id)
+        url = self.URLs[0] + '/chat/messages/'+str(conversation_id)
         headers = {'Authorization': 'Token '+self.token_id}
         r = requests.get(url, headers=headers)
         d = list()

@@ -88,13 +88,16 @@ class RegisterWindow(QtWidgets.QMainWindow):
         return True
 
     def send_request_to_server(self):
-        # Todo: send request to server with those data
-        login = self.lineEdit_login.text()
-        password = self.lineEdit_pass.text()
-        first_name = self.lineEdit_fname.text()
-        last_name = self.lineEdit_sname.text()
-        email = self.lineEdit_sname.text()
-        print(f"Wysyłam zapytanie o rejstrację z danymi: login={login}, haslo={password}, imie={first_name}, nazwisko:{last_name}, mail:{email}")
-        url = 'http://127.0.0.1:8000/chat/rest-auth/registration/'
-        payload = {'username': login, 'password1': password, 'password2': password}
-        r = requests.post(url, data=payload)
+        # try for server present
+        try:
+            login = self.lineEdit_login.text()
+            password = self.lineEdit_pass.text()
+            first_name = self.lineEdit_fname.text()
+            last_name = self.lineEdit_sname.text()
+            email = self.lineEdit_sname.text()
+            print(f"Wysyłam zapytanie o rejstrację z danymi: login={login}, haslo={password}, imie={first_name}, nazwisko:{last_name}, mail:{email}")
+            url = 'http://127.0.0.1:8000/chat/rest-auth/registration/'
+            payload = {'username': login, 'password1': password, 'password2': password}
+            r = requests.post(url, data=payload)
+        except:
+            pop_alert("Błąd sieci, sprawdź połączenie.")

@@ -28,6 +28,10 @@ class ForgotWindow(QtWidgets.QMainWindow):
 
     def send_request(self):
         # Todo: Send request to server
-        email = self.lineEdit_email.text()
-        print(f"Elo elo 320 wyślij prośbe o nowe hasło do: {email}")
-        return
+        # try for server present
+        try:
+
+            email = self.lineEdit_email.text()
+            print(f"Elo elo 320 wyślij prośbe o nowe hasło do: {email}")
+        except:
+            pop_alert("Błąd sieci, sprawdź połączenie.")

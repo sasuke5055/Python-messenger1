@@ -7,7 +7,6 @@ from .utils import create_message
 from .models import Conversation, UserConversation
 from rest_framework.authtoken.models import Token
 
-
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         try:

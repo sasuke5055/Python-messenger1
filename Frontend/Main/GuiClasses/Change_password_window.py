@@ -5,11 +5,12 @@ from SidePackage.Error import pop_alert
 
 
 class ChangePasswordWindow(QtWidgets.QMainWindow):
-    def __init__(self, LoginWindow):
+    def __init__(self, LoginWindow, URLs):
         super(ChangePasswordWindow, self).__init__()
         uic.loadUi('UiFiles/Change_password_window.ui', self)
         self.LoginWindow = LoginWindow
         self.minimum_pass_len = 4
+        self.URLs = URLs
 
         self.initUI()
         self.show()
