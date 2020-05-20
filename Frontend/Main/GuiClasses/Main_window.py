@@ -181,9 +181,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         rsa_key = self.key_manager.get_key(conversation_id)
         if rsa_key == None: #serious error, rsa keys should be added just after creating the new conversation
-            raise Exception("Admin doesn't have key!")
-       
-
+            # raise Exception("Admin doesn't have key!")
+            #TODO delete code below
+            new_key = self.key_manager.generate_key()
+            self.key_manager.add_key(conversation_id, new_key)
+            rsa_key = self.key_manager.get_key(conversation_id)    
+        
         encrypted_rsa_key = dh_local.encrypt_key(rsa_key['rsa_key']) #this is a dictionary
         self.messenger.send_key_response(conversation_id, user_id, dh_local_key, encrypted_rsa_key)
 
@@ -191,15 +194,16 @@ class MainWindow(QtWidgets.QMainWindow):
         print('NEW KEY RESPONSE!')
         print()
         conversation_id = data['conversation_id']
-        dh_key = int(data['dh_key'])
-        encrypted_rsa_key = data['rsa_key']
+        if not self.key_manager.contains_conversation(conversation_id):
+            dh_key = int(data['dh_key'])
+            encrypted_rsa_key = data['rsa_key']
 
-        dh = self.key_manager.get_dh(conversation_id)
-        dh.gen_private_key(dh_key) #now dh can decrypt RSA key
+            dh = self.key_manager.get_dh(conversation_id)
+            dh.gen_private_key(dh_key) #now dh can decrypt RSA key
 
-        decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key) #this is rsa.PrivateKey object
-        self.key_manager.add_key( conversation_id, decrypted_rsa_key)
-        #TODO do something after we receive the key
+            decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key) #this is rsa.PrivateKey object
+            self.key_manager.add_key( conversation_id, decrypted_rsa_key)
+            #TODO do something after we receive the key
 
 
 
