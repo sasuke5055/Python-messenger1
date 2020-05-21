@@ -1,4 +1,6 @@
 from PyQt5 import QtWidgets, uic, QtCore
+from PyQt5.QtGui import QFont
+
 from .Change_password_window import ChangePasswordWindow
 from .Friends_list_window import FriendsListWindow
 from .Friends_search_window import FriendsSearchWindow
@@ -12,7 +14,7 @@ entries = ["Ania", "Asia", "Ala"]
 messages = {"test": [
     "Ty: Mój stary to fanatyk wędkarstwa. Pół mieszkania zajebane wędkami najgorsze. Średnio raz w miesiącu ktoś wdepnie w leżący na ziemi haczyk czy kotwicę i trzeba wyciągać w szpitalu bo mają zadziory na końcu. W swoim 22 letnim życiu już z 10 razy byłem na takim zabiegu. Tydzień temu poszedłem na jakieś losowe badania to baba z recepcji jak mnie tylko zobaczyła to kazała buta ściągać xD bo myślała, że znowu hak w nodze. Druga połowa mieszkania zajebana Wędkarzem Polskim, Światem Wędkarza, Super Karpiem xD itp. Co tydzień ojciec robi objazd po wszystkich kioskach w mieście, żeby skompletować wszystkie wędkarskie tygodniki. Byłem na tyle głupi, że nauczyłem go into internety bo myślałem, że trochę pieniędzy zaoszczędzimy na tych gazetkach ale teraz nie dosyć, że je kupuje to jeszcze siedzi na jakichś forach dla wędkarzy i kręci gównoburze z innymi wędkarzami o najlepsze zanęty itp. Potrafi drzeć mordę do monitora albo wypierdolić klawiaturę za okno. Kiedyś ojciec mnie wkurwił to założyłem tam konto i go trolowałem pisząc w jego tematach jakieś losowe głupoty typu karasie jedzo guwno. Matka nie nadążała z gotowaniem bigosu na uspokojenie. Aha, ma już na forum rangę SUM, za najebanie 10k postów.Jak jest ciepło to co weekend zapierdala na ryby. Od jakichś 5 lat w każdą niedzielę jem rybę na obiad a ojciec pierdoli o zaletach jedzenia tego wodnego gówna. Jak się dostałem na studia to stary przez tydzień pie**olił że to dzięki temu, że jem dużo ryb bo zawierają fosfor i mózg mi lepiej pracuje.Co sobotę budzi ze swoim znajomym mirkiem całą rodzinę o 4 w nocy bo hałasują pakując wędki, robiąc kanapki itd.Przy jedzeniu zawsze pierdoli o rybach i za każdym razem temat schodzi w końcu na Polski Związek Wędkarski, ojciec sam się nakręca i dostaje strasznego bólu dupy durr niedostatecznie zarybiajo tylko kradno hurr, robi się przy tym cały czerwony i odchodzi od stołu klnąc i idzie czytać Wielką Encyklopedię Ryb Rzecznych żeby się uspokoić.W tym roku sam sobie kupił na święta ponton. Oczywiście do wigilii nie wytrzymał tylko już wczoraj go rozpakował i nadmuchał w dużym pokoju. Ubrał się w ten swój cały strój wędkarski i siedział cały dzień w tym pontonie na środku mieszkania. Obiad (karp) też w nim zjadł [cool][cześć]  ",
     "Ty: Cześć", "Ania: Co tam?", "Ty: HIPOPOTAM XDXDXD", "Ty: Jestem super"], "Asia": ["Asia: hallooo", "Ty: eloo"],
-            "Ala": ["Ty: Hejka naklejka!"], "Rozmowa prywatna": [], "druga rozmowa": []}
+    "Ala": ["Ty: Hejka naklejka!"], "Rozmowa prywatna": [], "druga rozmowa": []}
 username = "Ty"
 
 
@@ -98,8 +100,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.action_friens_list.triggered.connect(self.open_friends_list_window)
         self.action_find_friends.triggered.connect(self.open_friends_search_window)
 
-
-
     def setup_contacts(self):
         " show all contacs and groups of yours "
         for contact in self.get_contacts():
@@ -107,7 +107,13 @@ class MainWindow(QtWidgets.QMainWindow):
             new_item.setText(contact)
             self.list_contacts.addItem(new_item)
 
+    def set_contact_bold(self, id, bool):
+        # Todo:
+        pass
+
     def show_messages(self, item=None):
+        """make sending message possible"""
+        self.button_send_message.setEnabled(True)
         """show messages between you and given contact named 'item'"""
         contact = item.text() if item is not None else self.current_contact
         self.current_contact = contact
