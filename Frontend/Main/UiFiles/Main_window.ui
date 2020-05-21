@@ -107,7 +107,21 @@
     <addaction name="action_change_pass"/>
     <addaction name="action_change_infos"/>
    </widget>
+   <widget class="QMenu" name="menu_friends">
+    <property name="title">
+     <string>Znajomi</string>
+    </property>
+    <addaction name="action_friens_list"/>
+    <addaction name="action_find_friends"/>
+   </widget>
+   <widget class="QMenu" name="menuKonwersacje">
+    <property name="title">
+     <string>Konwersacje</string>
+    </property>
+   </widget>
    <addaction name="menu_profile"/>
+   <addaction name="menu_friends"/>
+   <addaction name="menuKonwersacje"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_change_pass">
@@ -118,6 +132,16 @@
   <action name="action_change_infos">
    <property name="text">
     <string>Zmiana danych</string>
+   </property>
+  </action>
+  <action name="action_friens_list">
+   <property name="text">
+    <string>Lista znajomych</string>
+   </property>
+  </action>
+  <action name="action_find_friends">
+   <property name="text">
+    <string>Szukaj znajomych</string>
    </property>
   </action>
  </widget>
