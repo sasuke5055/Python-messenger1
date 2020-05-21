@@ -1,6 +1,5 @@
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QMessageBox
-from SidePackage.Error import pop_alert
 from random import randint
 
 
@@ -18,11 +17,7 @@ class FriendsListWindow(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.listWidget_friends = self.findChild(QtWidgets.QListWidget, 'listWidget_friends')
-        self.add = self.findChild(QtWidgets.QPushButton, 'add')
-        self.remove = self.findChild(QtWidgets.QPushButton, 'rem')
 
-        self.add.pressed.connect(self.add_element_test)
-        self.remove.pressed.connect(self.remove_element)
         self.listWidget_friends.itemClicked.connect(self.friend_clicked)
         self.listWidget_friends.itemDoubleClicked.connect(self.friend_double_clicked)
 
