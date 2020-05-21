@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, uic, QtCore
 from .Change_password_window import ChangePasswordWindow
 from .Friends_list_window import FriendsListWindow
+from .Friends_search_window import FriendsSearchWindow
 
 import requests
 from .messaging import Messenger
@@ -93,7 +94,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Friends menu
         self.action_friens_list = self.findChild(QtWidgets.QAction, 'action_friens_list')
+        self.action_find_friends = self.findChild(QtWidgets.QAction, 'action_find_friends')
         self.action_friens_list.triggered.connect(self.open_friends_list_window)
+        self.action_find_friends.triggered.connect(self.open_friends_search_window)
+
+
 
     def setup_contacts(self):
         " show all contacs and groups of yours "
@@ -304,4 +309,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def open_friends_list_window(self):
         self.ui = FriendsListWindow(self, self.URLs)
+        self.setDisabled(True)
+
+    def open_friends_search_window(self):
+        self.ui = FriendsSearchWindow(self, self.URLs)
         self.setDisabled(True)

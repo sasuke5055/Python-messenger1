@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>231</width>
-    <height>331</height>
+    <width>320</width>
+    <height>329</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Moi znajomi</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QListWidget" name="listWidget_friends">
@@ -19,8 +19,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>211</width>
-      <height>311</height>
+      <width>300</width>
+      <height>310</height>
      </rect>
     </property>
    </widget>
