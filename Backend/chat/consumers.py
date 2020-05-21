@@ -7,6 +7,7 @@ from .utils import create_message
 from .models import Conversation, UserConversation
 from rest_framework.authtoken.models import Token
 
+
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         try:
@@ -77,46 +78,6 @@ class ChatConsumer(WebsocketConsumer):
             userConversation.is_listening = not userConversation.is_listening
             userConversation.save()
             #TODO - add close convesation
-        elif type == 'key_request':
-            print('GOT KEY REQUEST')
-            conversation_id = text_data_json['conversation_id']
-            dh_key =  text_data_json['dh_key']
-
-            conversation = Conversation.objects.get(pk=conversation_id)
-            if conversation:
-                userConversation = UserConversation.objects.get(user=self.user, conversation=conversation)
-                if userConversation: #sender of a request is a member of the conversation, notify admin
-                    room_group_name = 'chat_%s' % conversation.admin.pk
-                    async_to_sync(self.channel_layer.group_send)(
-                        room_group_name,
-                        {
-                            'type': 'key_request',
-                            'conversation_id': conversation_id,
-                            'dh_key': str(dh_key),
-                            'user_id': self.user.pk
-                        }
-                    )
-        elif type == 'key_response':
-            print('GOT KEY RESPONSE')
-            #get message from conversation admin, and redirect it to its proper receiver
-            conversation_id = text_data_json['conversation_id']
-            user_id = text_data_json['user_id']
-            dh_key = text_data_json['dh_key']
-            rsa_key = text_data_json['rsa_key']
-
-            room_group_name = 'chat_%s' % user_id
-            async_to_sync(self.channel_layer.group_send)(
-                room_group_name,
-                {
-                    'type': 'key_response',
-                    'user_id': user_id,
-                    'conversation_id': conversation_id,
-                    'dh_key': str(dh_key),
-                    'rsa_key': rsa_key
-                }
-            )
-
-
 
     # Receive message from room group
     def chat_message(self, event):
@@ -130,30 +91,6 @@ class ChatConsumer(WebsocketConsumer):
         async_to_sync(self.send(text_data=json.dumps({
             'type': 'new_notification',
             'conversation_id': conversation_id
-        })))
-
-    def key_request(self, event):
-        conversation_id = event['conversation_id']
-        dh_key = event['dh_key']
-        user_id = event['user_id']
-        async_to_sync(self.send(text_data=json.dumps({
-            'type': 'key_request',
-            'conversation_id': conversation_id,
-            'dh_key': dh_key,
-            'user_id': user_id
-        })))
-
-    def key_response(self, event):
-        user_id = event['user_id']
-        conversation_id = event['conversation_id']
-        dh_key = event['dh_key']
-        rsa_key = event['rsa_key']
-        async_to_sync(self.send(text_data=json.dumps({
-            'type': 'key_response',
-            'user_id': user_id, 
-            'conversation_id': conversation_id,
-            'dh_key': dh_key,
-            'rsa_key': rsa_key
         })))
     
     def message(self, event):
