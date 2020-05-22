@@ -11,6 +11,7 @@ from vexmessage import create_vex_message, decode_vex_message
 class Messenger(QtCore.QObject):
     message_signal = QtCore.pyqtSignal()
     key_received_signal = QtCore.pyqtSignal()
+    request_received_singal = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -18,6 +19,7 @@ class Messenger(QtCore.QObject):
         self.callback_new_message_reveiced = []
         self.callback_new_key_request = []
         self.callback_new_key_response = []
+        self.callback_new_friend_request = []
 
     def add_callback_new_message_received(self, f):
         self.callback_new_message_reveiced.append(f)
@@ -27,6 +29,9 @@ class Messenger(QtCore.QObject):
 
     def add_callback_new_key_response(self, f):
         self.callback_new_key_response.append(f)
+
+    def add_callback_new_friend_request(self, f):
+        self.callback_new_friend_request.append(f)
 
     def on_message(self, data):
         data = json.loads(data)
@@ -41,10 +46,10 @@ class Messenger(QtCore.QObject):
             for f in self.callback_new_key_response:
                 f(data)
             self.key_received_signal.emit()
-
-
-                
-            
+        elif data['type'] == 'friend_request':
+            for f in self.callback_new_friend_request:
+                f(data)
+            self.request_received_singal.emit()
 
     def on_error(self, *args):
         print('Errors:')
@@ -64,6 +69,13 @@ class Messenger(QtCore.QObject):
 
         self.thread = Thread(target=self.sub_socket.run_forever, daemon=True)
         self.thread.start()
+
+    def send_friend_request(self, username):
+        data = {
+            'type': 'invite_friend',
+            'friend': username
+        }
+        self.sub_socket.send(json.dumps(data))
 
     def publish_message(self, message, conversation_id):
         data = {
@@ -90,4 +102,3 @@ class Messenger(QtCore.QObject):
                 'rsa_key': rsa_key
             }
         self.sub_socket.send(json.dumps(data))
-

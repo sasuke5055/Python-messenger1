@@ -3,7 +3,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
 from .serializers import MessageSerializer
-from .utils import create_message
+from .utils import create_message, create_friend_request
 from .models import Conversation, UserConversation
 from rest_framework.authtoken.models import Token
 
@@ -116,7 +116,28 @@ class ChatConsumer(WebsocketConsumer):
                     'rsa_key': rsa_key
                 }
             )
+        elif type == 'invite_friend':
+            friend_username = text_data_json['friend']
 
+            receiver = User.objects.get(username=friend_username)
+            notifications = receiver.notifications.get()
+            # if friend request was not already sent
+            if not FriendRequest.objects.filter(user=notifications,
+                                                sender=self.user.username).exists():
+                notifications = receiver.notifications.get()
+                request = create_friend_request(notifications, self.user)
+                room_group_name = f'chat_{self.user.pk}'
+                async_to_sync(self.channel_layer.group_send)(
+                room_group_name,
+                {
+                    'type': 'invite',
+                    'sender_name': self.user.username,
+                    'request_id': request.id,
+                    'timestamp': request.timestamp
+                }
+            )
+
+            
 
 
     # Receive message from room group
@@ -169,6 +190,19 @@ class ChatConsumer(WebsocketConsumer):
             'timestamp': timestamp,
             'content': content
         })))
+
+    def invite(self, event):
+        request_id = event['request_id']
+        sender = event['sender']
+        timestamp = event['timestamp']
+        async_to_sync(self.send(text_data=json.dumps({
+            'type': 'friend_request',
+            'sender': sender,
+            'request_id': request_id,
+            'timestamp': timestamp
+        })))
+
+
 
 # class ChatConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):

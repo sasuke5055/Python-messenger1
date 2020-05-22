@@ -22,7 +22,7 @@ def add_user_to_conversation(user, conversation):
 
 def create_friend_request(notifications_set: Notifications, sender: User):
   try:
-    new_request = FriendRequest(user=notifications_set, sender=sender)
+    new_request = FriendRequest(user=notifications_set, sender=sender, sender_name=sender.username)
 
     notifications_set.unseen = True
     new_request.save()
@@ -56,3 +56,6 @@ def accept_friend(user: User, friend: User, request: FriendRequest):
 
 def reject_friend(request: FriendRequest):
   request.delete()
+
+
+# def search_users()

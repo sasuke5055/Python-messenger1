@@ -109,4 +109,21 @@ class NotificationsView(APIView):
         notifications = request.user.notifications.get()
         content = {'content':  FriendRequestsSerializer(notifications.get_all_notifications(), many=True).data}
         return Response(content)
+
+class SearchView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    # return users who's username contains key
+    def get(self, request):
+        key = request.data['key']
+
+        matching_friends = request.user.contact.get().friends.filter(username__icontains=key)
+        friends = [x.username for x in matching_friends]
+        # getting users who are not your friends 
+        users = User.objects.exclude().filter(username__icontains=key).exclude(username__in=friends)
+
+        matching_friends = UserSerializer(matching_friends, many=True).data
+        strangers = UserSerializer(users, many=True).data
+        content = {'content': matching_friends+strangers}
+        return Response(content)
     

@@ -107,6 +107,7 @@ class Notifications(models.Model):
 class FriendRequest(models.Model):
     user = models.ForeignKey(Notifications, related_name='receiver', on_delete=models.CASCADE)
     sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
+    sender_name = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now_add=True)
     notify_type = models.CharField(max_length=20, blank=True)
 

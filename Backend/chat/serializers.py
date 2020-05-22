@@ -36,4 +36,4 @@ class FriendRequestsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FriendRequest
-        fields = ['id', 'sender', 'timestamp']
+        fields = ['id', 'sender_name', 'timestamp']

@@ -56,6 +56,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messenger.add_callback_new_message_received(self.append_new_message)
         self.messenger.add_callback_new_key_request(self.handle_key_request)
         self.messenger.add_callback_new_key_response(self.handle_key_response)
+        self.messenger.add_callback_new_friend_request(self.handle_friend_request)
 
         
     def initUi(self):
@@ -293,7 +294,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
         messages[contact].append(message_prefix + content)
 
-        
+ 
+    def handle_friend_request(self, data):
+        request_id = int(data['id'])
+        sender_name = data['sender']
+        timestamp = data['timestamp']
+
+        # TODO wyświetlić powiadomienie????????
+        # TODO akceptacja/odrzucenie requesta na https
+        # TODO możee po prostu robić powiadomienie i weźmiesz sobie ostatniego requesta z bazy
+
+    def send_friend_request(self, username):
+        self.messenger.send_friend_request(username)
+
         
 
 

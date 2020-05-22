@@ -6,6 +6,10 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.conf.urls import url
+from rest_auth.views import (
+    LoginView, LogoutView, UserDetailsView, PasswordChangeView,
+    PasswordResetView, PasswordResetConfirmView
+)
 
 
 schema_view = get_schema_view(
@@ -31,6 +35,9 @@ urlpatterns = [
    path('notifications/handle-notification/', views.NotificationsView.as_view(), name='handle_notify'),
    path('notifications/', views.NotificationsView.as_view(), name='notifications'),
    path('friends/remove/', views.ContactsView.as_view(), name='remove_friend'),
+   path('search/', views.SearchView.as_view(), name='search'),
+   path('rest-auth/user/', UserDetailsView.as_view(), name='rest_user_details'),
+   path('rest-auth/password/change/', PasswordChangeView.as_view(), name='rest_password_change'),
    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
