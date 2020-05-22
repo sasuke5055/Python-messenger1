@@ -25,11 +25,6 @@ class FriendsListWindow(QtWidgets.QMainWindow):
         # Unlock login window when closing this window
         self.MainWindow.setDisabled(False)
 
-    def add_element_test(self):
-        string = "ebebebbe " + str(randint(1, 1000))
-        self.listWidget_friends.addItem(string)
-        self.friends_list.append((string, len(self.friends_list)))
-
     def add_element(self, text):
         self.listWidget_friends.addItem(text)
 
