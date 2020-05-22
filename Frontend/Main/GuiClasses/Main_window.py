@@ -1,9 +1,12 @@
 from PyQt5 import QtWidgets, uic, QtCore
-from GuiClasses.Change_password_window import ChangePasswordWindow
+from PyQt5.QtGui import QFont
+
+from .Change_password_window import ChangePasswordWindow
+from .Friends_list_window import FriendsListWindow
+from .Friends_search_window import FriendsSearchWindow
+
 import requests
-from threading import Thread
-import json
-from GuiClasses.messaging import Messenger
+from .messaging import Messenger
 from .Managers.KeyManager import KeyManager
 
 entries = ["Ania", "Asia", "Ala"]
@@ -87,8 +90,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_messages.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
 
         # Menu setup
+        # Profile menu
         self.action_change_pass = self.findChild(QtWidgets.QAction, 'action_change_pass')
         self.action_change_pass.triggered.connect(self.open_change_password_window)
+
+        # Friends menu
+        self.action_friens_list = self.findChild(QtWidgets.QAction, 'action_friens_list')
+        self.action_find_friends = self.findChild(QtWidgets.QAction, 'action_find_friends')
+        self.action_friens_list.triggered.connect(self.open_friends_list_window)
+        self.action_find_friends.triggered.connect(self.open_friends_search_window)
 
     def setup_contacts(self):
         " show all contacs and groups of yours "
@@ -97,7 +107,13 @@ class MainWindow(QtWidgets.QMainWindow):
             new_item.setText(contact)
             self.list_contacts.addItem(new_item)
 
+    def set_contact_bold(self, id, bool):
+        # Todo:
+        pass
+
     def show_messages(self, item=None):
+        """make sending message possible"""
+        self.button_send_message.setEnabled(True)
         """show messages between you and given contact named 'item'"""
         contact = item.text() if item is not None else self.current_contact
         self.current_contact = contact
@@ -226,10 +242,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.messenger.publish_message(text, conversation_id)
 
-    def open_change_password_window(self):
-        self.ui = ChangePasswordWindow(self, self.URLs)
-        self.setDisabled(True)
-
     def get_contacts(self):
         url = self.URLs[0] + '/chat/conversations/'
         headers = {'Authorization': 'Token ' + self.token_id}
@@ -296,3 +308,15 @@ class MainWindow(QtWidgets.QMainWindow):
             message_prefix = author_name + ": "
 
         messages[contact].append(message_prefix + content)
+
+    def open_change_password_window(self):
+        self.ui = ChangePasswordWindow(self, self.URLs)
+        self.setDisabled(True)
+
+    def open_friends_list_window(self):
+        self.ui = FriendsListWindow(self, self.URLs)
+        self.setDisabled(True)
+
+    def open_friends_search_window(self):
+        self.ui = FriendsSearchWindow(self, self.URLs)
+        self.setDisabled(True)

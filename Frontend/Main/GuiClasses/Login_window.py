@@ -7,6 +7,7 @@ from SidePackage.Error import pop_alert
 
 import requests
 
+
 class LoginWindow(QtWidgets.QMainWindow):
     def __init__(self, URLs):
         super(LoginWindow, self).__init__()
@@ -50,24 +51,25 @@ class LoginWindow(QtWidgets.QMainWindow):
         # login using username and password
         print(f"Login user {username} with password {password}")
 
-        #try for present server
-        # try:
-        url = self.URLs[0] + '/chat/api-token-auth/'
-        payload = {'username': username, 'password': password}
-        r = requests.post(url, data=payload)
-        print(r.status_code)
-        if r.status_code == 200:
-            self.close()
-            data = r.json()
-            token = data["token"]
-            user_id = data["user_id"]
-            self.open_main_window(token, user_id)
-        else:
-            pop_alert("Niepoprawne dane logowania!")
-        #except:
-        #    # Todo okienko z bledem sieci
-        #    print("Błąd serwera")
-        #    pop_alert("Błąd sieci, sprawdź połączenie.")
+        # try for present server
+        try:
+            url = self.URLs[0] + '/chat/api-token-auth/'
+            payload = {'username': username, 'password': password}
+            r = requests.post(url, data=payload)
+            print(r.status_code)
+            if r.status_code == 200:
+                self.close()
+                data = r.json()
+                token = data["token"]
+                user_id = data["user_id"]
+                self.open_main_window(token, user_id)
+            else:
+                pop_alert("Niepoprawne dane logowania!")
+        except requests.ConnectionError:
+
+            # Todo okienko z bledem sieci
+            print("Błąd serwera")
+            pop_alert("Błąd sieci, sprawdź połączenie.")
 
     def forgot_button_pressed(self):
         self.ui = ForgotWindow(self)
@@ -110,7 +112,7 @@ class LoginWindow(QtWidgets.QMainWindow):
 
     def open_main_window(self, token_id, user_id):
         print('Opening main window')
-        #open new window
+        # open new window
         self.ui = MainWindow(token_id, user_id, self.URLs)
 
     def validate_data(self, login, password):
