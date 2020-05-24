@@ -20,6 +20,7 @@ class Messenger(QtCore.QObject):
         self.callback_new_key_request = []
         self.callback_new_key_response = []
         self.callback_new_friend_request = []
+        self.callback_new_friend_accepted = []
 
     def add_callback_new_message_received(self, f):
         self.callback_new_message_reveiced.append(f)
@@ -32,6 +33,9 @@ class Messenger(QtCore.QObject):
 
     def add_callback_new_friend_request(self, f):
         self.callback_new_friend_request.append(f)
+    
+    def add_callback_new_friend_accepted(self, f):
+        self.callback_new_friend_accepted.append(f)
 
     def on_message(self, data):
         data = json.loads(data)
@@ -50,6 +54,9 @@ class Messenger(QtCore.QObject):
             for f in self.callback_new_friend_request:
                 f(data)
             self.request_received_singal.emit()
+        elif data['type'] == 'accepted_f_request':
+            for f in self.callback_new_friend_accepted:
+                f(data)
 
     def on_error(self, *args):
         print('Errors:')

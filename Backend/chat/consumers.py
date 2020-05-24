@@ -3,8 +3,8 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
 from .serializers import MessageSerializer
-from .utils import create_message, create_friend_request
-from .models import Conversation, UserConversation
+from .utils import create_message, create_friend_request, accept_friend
+from .models import Conversation, UserConversation, FriendRequest
 from rest_framework.authtoken.models import Token
 
 
@@ -133,10 +133,22 @@ class ChatConsumer(WebsocketConsumer):
                     'type': 'invite',
                     'sender_name': self.user.username,
                     'request_id': request.id,
-                    'timestamp': request.timestamp
+                    'timestamp': str(request.timestamp)
                 }
             )
 
+        elif type == 'accept friend':
+            request_id = text_data_json['id']
+            f_request = FriendRequest.objects.get(id=request_id)
+            accept_friend(self.user, f_request.sender, f_request)
+            room_group_name = f'chat_{f_request.sender.username}'
+            async_to_sync(self.channel_layer.group_send)(
+                room_group_name,
+                {
+                    'type': 'accepted_req_notify',
+                    'sender_name': self.user.username,
+                }
+            )
             
 
 
@@ -200,6 +212,13 @@ class ChatConsumer(WebsocketConsumer):
             'sender': sender,
             'request_id': request_id,
             'timestamp': timestamp
+        })))
+
+    def accepted_req_notify(self, event):
+        sender = event['sender_name']
+        async_to_sync(self.send(text_data=json.dumps({
+            'type': 'accepted_f_request',
+            'sender': sender
         })))
 
 

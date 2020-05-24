@@ -48,7 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def connect_to_socket(self):
-        address = f"ws://127.0.0.1:8000/ws/chat/xd/"
+        address = f"ws://127.0.0.1:8000/ws/chat/"
         self.messenger = Messenger()
         self.messenger.subscribe_to_socket(address, self.token_id)
         self.messenger.message_signal.connect(self.refresh_messages)
@@ -57,6 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messenger.add_callback_new_key_request(self.handle_key_request)
         self.messenger.add_callback_new_key_response(self.handle_key_response)
         self.messenger.add_callback_new_friend_request(self.handle_friend_request)
+        self.messenger.add_callback_new_friend_accepted(self.new_friend_accepted)
 
         
     def initUi(self):
@@ -306,6 +307,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def send_friend_request(self, username):
         self.messenger.send_friend_request(username)
+    
+    def new_friend_accepted(self, data):
+        friend_name = data['sender']
+        # TODO notify user about friend request acceptation
+        pass
+
 
         
 
