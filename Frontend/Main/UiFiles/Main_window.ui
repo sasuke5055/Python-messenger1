@@ -116,6 +116,7 @@
     </property>
     <addaction name="action_friens_list"/>
     <addaction name="action_find_friends"/>
+    <addaction name="action_invitations_list"/>
    </widget>
    <widget class="QMenu" name="menuKonwersacje">
     <property name="title">
@@ -145,6 +146,11 @@
   <action name="action_find_friends">
    <property name="text">
     <string>Szukaj znajomych</string>
+   </property>
+  </action>
+  <action name="action_invitations_list">
+   <property name="text">
+    <string>Zaproszenia</string>
    </property>
   </action>
  </widget>

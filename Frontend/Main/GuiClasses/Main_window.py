@@ -4,6 +4,7 @@ from PyQt5.QtGui import QFont
 from .Change_password_window import ChangePasswordWindow
 from .Friends_list_window import FriendsListWindow
 from .Friends_search_window import FriendsSearchWindow
+from .Friends_invitations_window import FriendsInvitationsWindows
 
 import requests
 from .messaging import Messenger
@@ -97,8 +98,10 @@ class MainWindow(QtWidgets.QMainWindow):
         # Friends menu
         self.action_friens_list = self.findChild(QtWidgets.QAction, 'action_friens_list')
         self.action_find_friends = self.findChild(QtWidgets.QAction, 'action_find_friends')
+        self.action_invitations_list = self.findChild(QtWidgets.QAction, 'action_invitations_list')
         self.action_friens_list.triggered.connect(self.open_friends_list_window)
         self.action_find_friends.triggered.connect(self.open_friends_search_window)
+        self.action_invitations_list.triggered.connect(self.open_fiends_invitations_windows)
 
     def setup_contacts(self):
         " show all contacs and groups of yours "
@@ -123,7 +126,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if not self.key_manager.contains_conversation(conversation_id):  # send a request for the RSA key
             self.request_key(conversation_id)
             # TODO we must wait for the key from conversation admin, leave this function/tell user about it
-
 
         self.list_messages.clear()
         if contact not in self.initialised_conversations:
@@ -320,4 +322,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def open_friends_search_window(self):
         self.ui = FriendsSearchWindow(self, self.URLs)
+        self.setDisabled(True)
+
+    def open_fiends_invitations_windows(self):
+        self.ui = FriendsInvitationsWindows(self, self.URLs)
         self.setDisabled(True)
