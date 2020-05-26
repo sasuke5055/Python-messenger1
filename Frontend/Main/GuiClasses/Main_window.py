@@ -124,6 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.request_key(conversation_id)
             # TODO we must wait for the key from conversation admin, leave this function/tell user about it
 
+
         self.list_messages.clear()
         if contact not in self.initialised_conversations:
             print('CONTACT IS:', contact)
