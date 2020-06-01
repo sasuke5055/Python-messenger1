@@ -1,3 +1,4 @@
+import requests
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QMessageBox, QDialogButtonBox, QSizePolicy
 from random import randint
@@ -17,10 +18,7 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.listWidget_invitations = self.findChild(QtWidgets.QListWidget, 'listWidget_invitations')
-        self.add_element("Krzysiu 1", 1)
-        self.add_element("Kasia 1", 2)
 
-        self.add_element("Jacek cichoń 69", 3)
 
     def closeEvent(self, event):
         # Unlock login window when closing this window
@@ -63,20 +61,26 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
         del self.invitations_list[row]
 
     def get_invitations(self):
-        # todo: send request to server to get invitations (index + (string) name)
-        self.invitations_list = []
-        # todo: set correct sorting attribute
-        self.invitations_list.sort(key=lambda f: f[1])
+        self.listWidget_invitations.clear()
+        self.users = []
+        url = self.URLs[0] + '/chat/notifications/'
+        headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
+        r = requests.get(url, headers=headers)
+        respond = r.json()['content']
+
+        self.invitations_list = respond
+        self.invitations_list.sort(key=lambda f: f['timestamp'])
+        print(self.invitations_list)
         for i in range(len(self.invitations_list)):
             f = self.invitations_list[i]
-            self.add_element(f[1], i)
+            self.add_element(f['sender_name'], i)
 
     def accept_invitation(self, index):
         item = self.invitations_list[index]
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
-        msg.setText(f"Czy zaakceptować zaprosznie od {item.text()}?")
-        msg.setInformativeText(f"Ty i {item.text()} staniecie się znajomymi")
+        msg.setText(f"Czy zaakceptować zaprosznie od {item['sender_name']}?")
+        msg.setInformativeText(f"Ty i {item['sender_name']} staniecie się znajomymi")
         msg.setWindowTitle("Dodawanie znajomego")
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Abort)
         respond = msg.exec_()
@@ -89,7 +93,7 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
         item = self.invitations_list[index]
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
-        msg.setText(f"Czy odrzucić zaprosznie od {item.text()}?")
+        msg.setText(f"Czy odrzucić zaprosznie od {item['sender_name']}?")
         msg.setWindowTitle("Odrzucanie zaproszenia")
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Abort)
         respond = msg.exec_()
@@ -100,24 +104,16 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
 
     def add_friend(self, index):
         print(f"Dodaje {index}")
-        # todo: Send request to server to add user, where id == id
-        id = index
-
-        # request to server (id)
-        respond = True
-        if respond:
-            # get new list
-            self.get_invitations()
+        id = self.invitations_list[index]['id']
+        self.MainWindow.send_friend_req_response(id, 'True')
+        self.get_invitations()
+        self.close()
 
     def remove_invitation(self, index):
         print(f"Usuwam {index}")
-        # todo: Send request to server to remove invitation, where id == id
-        id = index
-
-        # request to server (id)
-        respond = True
-        if respond:
-            # get new list
-            self.get_invitations()
+        id = self.invitations_list[index]['id']
+        self.MainWindow.send_friend_req_response(id, 'False')
+        self.get_invitations()
+        self.close()
 
 

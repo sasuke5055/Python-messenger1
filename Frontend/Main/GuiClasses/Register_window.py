@@ -96,7 +96,7 @@ class RegisterWindow(QtWidgets.QMainWindow):
             last_name = self.lineEdit_sname.text()
             email = self.lineEdit_sname.text()
             print(f"Wysyłam zapytanie o rejstrację z danymi: login={login}, haslo={password}, imie={first_name}, nazwisko:{last_name}, mail:{email}")
-            url = 'http://127.0.0.1:8000/chat/rest-auth/registration/'
+            url = self.LoginWindow.URLs[0] + '/chat/rest-auth/registration/'
             payload = {'username': login, 'password1': password, 'password2': password}
             r = requests.post(url, data=payload)
         except:

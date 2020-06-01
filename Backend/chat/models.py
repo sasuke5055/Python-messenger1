@@ -1,9 +1,17 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
+from django.dispatch import receiver
+from allauth.account.signals import user_signed_up
 
 User = get_user_model()
+# executes when new user signed up
+@receiver(user_signed_up)
+def after_user_signed_up(request, user, **kwargs):
+    # create contact model after registration
+    contact = Contact.objects.create(user=user)
 
+    # create notifications model after registration
+    notifications = Notifications.objects.create(user=user)
 
 
 class Contact(models.Model):
@@ -69,5 +77,45 @@ class UserConversation(models.Model):
     def __str__(self):
         return "{} conversation: {}".format(self.user, self.conversation)
 
+
+class Notifications(models.Model):
+    user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+
+    unseen = models.BooleanField(default=False)
+    last_seen_timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notifications of {self.user.username}"
+
+    def get_all_notifications(self):
+        return self.receiver.order_by('-timestamp').all()
+
+    def get_last_notifications_timestamp(self, timestamp):
+        return self.receiver.order_by('-timestamp').filter(timestamp__gt=timestamp)
+
+    def get_unseen(self):
+        if not self.unseen:
+            return []
+        else:
+            return self.get_last_notifications_timestamp(self.last_seen_timestamp)
+
+    def count_unread(self):
+        return len(self.get_unseen())
+
+
+class FriendRequest(models.Model):
+    user = models.ForeignKey(Notifications, related_name='receiver', on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
+    sender_name = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    notify_type = models.CharField(max_length=20, blank=True)
+
+    if User == sender:
+        notify_type = 'request invite'
+    else:
+        notify_type = 'request accept'
+
+    def __str__(self):
+        return f"type: {self.notify_type}, from: {self.sender}, to: {self.user.user}"
 
 

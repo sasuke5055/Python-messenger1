@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtGui import QFont
+from SidePackage.Error import pop_alert
 
 from .Change_password_window import ChangePasswordWindow
 from .Friends_list_window import FriendsListWindow
@@ -60,9 +61,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messenger.subscribe_to_socket(address, self.token_id)
         self.messenger.message_signal.connect(self.refresh_messages)
         self.messenger.key_received_signal.connect(self.on_key_receive)
+        self.messenger.message_signal.connect(self.f_req_response)
         self.messenger.add_callback_new_message_received(self.append_new_message)
         self.messenger.add_callback_new_key_request(self.handle_key_request)
         self.messenger.add_callback_new_key_response(self.handle_key_response)
+        self.messenger.add_callback_new_friend_request(self.handle_friend_request)
+        self.messenger.add_callback_friend_req_response(self.friend_req_repsponse)
 
     def initUi(self):
         self.button_send_message = self.findChild(QtWidgets.QPushButton, 'button_send_message')
@@ -185,6 +189,11 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def on_key_receive(self):
         # TODO this is invoked when we receive a new key
+        pass
+
+    @QtCore.pyqtSlot()
+    def f_req_response(self):
+
         pass
 
     def handle_key_request(self, data):  # current user is an admin, and we should send the key
@@ -327,3 +336,28 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_fiends_invitations_windows(self):
         self.ui = FriendsInvitationsWindows(self, self.URLs)
         self.setDisabled(True)
+
+    # Todo: Przyszło zaproszenie
+    def handle_friend_request(self, data):
+        print(data)
+        request_id = int(data['request_id'])
+        sender_name = data['sender']
+        timestamp = data['timestamp']
+        pop_alert("Nowe Zaproszenie!!!!!!!!!!!!!!111")
+
+        # TODO akceptacja/odrzucenie requesta na https
+        # TODO możee po prostu robić powiadomienie i weźmiesz sobie ostatniego requesta z bazy
+
+    def send_friend_request(self, id):
+        self.messenger.send_friend_request(id)
+
+    def friend_req_repsponse(self, data):
+        friend_name = data['sender']
+        if data['response'] == 'True':
+            pop_alert("Ktoś mie dodał do znajomych")
+        else:
+            pop_alert("Ktoś mnie odrzucił")
+        pass
+
+    def send_friend_req_response(self, req_id, response):
+        self.messenger.send_f_req_response(req_id, response)
