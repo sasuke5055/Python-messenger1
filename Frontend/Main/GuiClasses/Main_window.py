@@ -11,12 +11,8 @@ import requests
 from .messaging import Messenger
 from .Managers.KeyManager import KeyManager
 
-entries = ["Ania", "Asia", "Ala"]
 # TODO kluczami messages powinny być id konwersacji
-messages = {"test": [
-    "Ty: Mój stary to fanatyk wędkarstwa. Pół mieszkania zajebane wędkami najgorsze. Średnio raz w miesiącu ktoś wdepnie w leżący na ziemi haczyk czy kotwicę i trzeba wyciągać w szpitalu bo mają zadziory na końcu. W swoim 22 letnim życiu już z 10 razy byłem na takim zabiegu. Tydzień temu poszedłem na jakieś losowe badania to baba z recepcji jak mnie tylko zobaczyła to kazała buta ściągać xD bo myślała, że znowu hak w nodze. Druga połowa mieszkania zajebana Wędkarzem Polskim, Światem Wędkarza, Super Karpiem xD itp. Co tydzień ojciec robi objazd po wszystkich kioskach w mieście, żeby skompletować wszystkie wędkarskie tygodniki. Byłem na tyle głupi, że nauczyłem go into internety bo myślałem, że trochę pieniędzy zaoszczędzimy na tych gazetkach ale teraz nie dosyć, że je kupuje to jeszcze siedzi na jakichś forach dla wędkarzy i kręci gównoburze z innymi wędkarzami o najlepsze zanęty itp. Potrafi drzeć mordę do monitora albo wypierdolić klawiaturę za okno. Kiedyś ojciec mnie wkurwił to założyłem tam konto i go trolowałem pisząc w jego tematach jakieś losowe głupoty typu karasie jedzo guwno. Matka nie nadążała z gotowaniem bigosu na uspokojenie. Aha, ma już na forum rangę SUM, za najebanie 10k postów.Jak jest ciepło to co weekend zapierdala na ryby. Od jakichś 5 lat w każdą niedzielę jem rybę na obiad a ojciec pierdoli o zaletach jedzenia tego wodnego gówna. Jak się dostałem na studia to stary przez tydzień pie**olił że to dzięki temu, że jem dużo ryb bo zawierają fosfor i mózg mi lepiej pracuje.Co sobotę budzi ze swoim znajomym mirkiem całą rodzinę o 4 w nocy bo hałasują pakując wędki, robiąc kanapki itd.Przy jedzeniu zawsze pierdoli o rybach i za każdym razem temat schodzi w końcu na Polski Związek Wędkarski, ojciec sam się nakręca i dostaje strasznego bólu dupy durr niedostatecznie zarybiajo tylko kradno hurr, robi się przy tym cały czerwony i odchodzi od stołu klnąc i idzie czytać Wielką Encyklopedię Ryb Rzecznych żeby się uspokoić.W tym roku sam sobie kupił na święta ponton. Oczywiście do wigilii nie wytrzymał tylko już wczoraj go rozpakował i nadmuchał w dużym pokoju. Ubrał się w ten swój cały strój wędkarski i siedział cały dzień w tym pontonie na środku mieszkania. Obiad (karp) też w nim zjadł [cool][cześć]  ",
-    "Ty: Cześć", "Ania: Co tam?", "Ty: HIPOPOTAM XDXDXD", "Ty: Jestem super"], "Asia": ["Asia: hallooo", "Ty: eloo"],
-            "Ala": ["Ty: Hejka naklejka!"], "Rozmowa prywatna": [], "druga rozmowa": []}
+messages = {}
 username = "Ty"
 
 
@@ -55,6 +51,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setup_contacts()
         self.show()
+
+    
+
 
     def connect_to_socket(self):
         address = self.URLs[1] + "/ws/chat/xd/"
@@ -123,9 +122,28 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_messages(self, item=None):
         """make sending message possible"""
+        self.list_messages.clear()
         self.button_send_message.setEnabled(True)
+        button_load_messages = QtWidgets.QPushButton("next")
+        item_widget = QtWidgets.QListWidgetItem()
+        widget = QtWidgets.QWidget()
+        widget_layout =  QtWidgets.QVBoxLayout()
+        widget_layout.addWidget(button_load_messages)
+        widget_layout.addStretch()
+        widget_layout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
+        widget.setLayout(widget_layout)
+        item_widget.setSizeHint(widget.sizeHint())
+        self.list_messages.addItem(item_widget)
+        self.list_messages.setItemWidget(item_widget,widget)
+
         """show messages between you and given contact named 'item'"""
         contact = item.text() if item is not None else self.current_contact
+        if item is not None:
+            messages.pop(self.current_contact,None)
+            if self.current_contact in self.initialised_conversations:
+                self.initialised_conversations.remove(self.current_contact)
+        button_load_messages.clicked.connect(self.get_more_messages)
+
         self.current_contact = contact
 
         conversation_id = self.conversation_ids[contact]
@@ -135,10 +153,10 @@ class MainWindow(QtWidgets.QMainWindow):
             pop_alert("Poczekaj na wygenerowanie")
             # TODO we must wait for the key from conversation admin, leave this function/tell user about it
 
-        self.list_messages.clear()
         if contact not in self.initialised_conversations:
             print('CONTACT IS:', contact)
-            contact_messages = self.get_messages(contact)
+            self.get_messages(contact)
+            contact_messages = messages[contact]
             self.initialised_conversations.append(contact)
         contact_messages = messages.get(contact, [])
         for message_info in contact_messages:
@@ -273,13 +291,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         return e
 
-    def get_messages(self, contact):
+    def get_messages(self, contact,start=0,end=2):
+        if start == 0 and end == 2: 
+            messages.pop(contact,None)
+
         conversation_id = self.conversation_ids[contact]
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
 
         url = self.URLs[0] + '/chat/messages/' + str(conversation_id)
         headers = {'Authorization': 'Token ' + self.token_id}
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, data={'start':start, 'end':end})
         d = list()
         data = r.json()['content']
         if contact not in messages:
@@ -306,14 +327,58 @@ class MainWindow(QtWidgets.QMainWindow):
         messages[contact].reverse()
         return messages[contact]
 
-    def append_new_message(self, message):
+    def get_more_messages(self,e=1):
+        """ get 'e' more messages from current conversation.   """
+        contact = self.current_contact
+        
+        print("XDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+        starting_pos = len(messages[contact]) or 0
+        conversation_id = self.conversation_ids[contact]
+        url = self.URLs[0]+'/chat/messages/'+str(conversation_id)
+        print(url)
+        headers = {'Authorization': 'Token '+self.token_id}
+        r = requests.get(url, headers=headers, data = {'start': starting_pos, 'end': 1})
+        d = list()
+        temp_messages = list()
+        data = r.json()['content']
+        print(data)
+        if contact not in messages:
+            messages[contact] = []
+        for message in data:
+            content = self.decode_message(message,conversation_id)
+            author_id = message['author']['id']
+            if author_id == self.user_id:
+                message_prefix = "Ty: "
+            else:
+                author_name = message['author']['username']
+                message_prefix = author_name + ": "
+                
+            temp_messages.append(message_prefix + content) 
+            d.append((author_id, content))
+        """return e more messages between you and given contact"""
+        temp_messages.reverse()
+        temp_messages.extend(messages[contact])
+        """we need to create new cache and replace current one with it """
+        messages[contact] = temp_messages
+        self.show_messages()
+        """ we then refresh the chat and scroll messages to top """
+        self.list_messages.scrollToTop()
+        
+    def decode_message(self,message,conversation_id):
         content = message['content']
-        author_id = int(message['author']['id'])
-        conversation_id = int(message['conversation_id'])
+        print(message)
 
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
         if rsa_manager != None:
             content = rsa_manager.decrypt(content)
+
+
+        return content
+
+    def append_new_message(self, message):
+        author_id = int(message['author']['id'])
+        conversation_id = int(message['conversation_id'])
+        content = self.decode_message(message,conversation_id)
 
         contact = next((title for title, id in self.conversation_ids.items() if id == conversation_id), None)
         if contact not in self.initialised_conversations:
