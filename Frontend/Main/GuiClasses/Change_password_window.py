@@ -1,3 +1,4 @@
+import requests
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QMessageBox
 from SidePackage.Validation import validate_password
@@ -5,10 +6,10 @@ from SidePackage.Error import pop_alert
 
 
 class ChangePasswordWindow(QtWidgets.QMainWindow):
-    def __init__(self, LoginWindow, URLs):
+    def __init__(self, MainWindow, URLs):
         super(ChangePasswordWindow, self).__init__()
         uic.loadUi('UiFiles/Change_password_window.ui', self)
-        self.LoginWindow = LoginWindow
+        self.MainWindow = MainWindow
         self.minimum_pass_len = 4
         self.URLs = URLs
 
@@ -25,7 +26,7 @@ class ChangePasswordWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         # Unlock login window when closing this window
-        self.LoginWindow.setDisabled(False)
+        self.MainWindow.setDisabled(False)
 
     def confirm_button_pressed(self):
         # Check old pass
@@ -67,8 +68,10 @@ class ChangePasswordWindow(QtWidgets.QMainWindow):
     def send_request(self):
         # Todo: Send request to server
         new_password = self.lineEdit_new_pass2.text()
-        print(f"Wysyłam prosbe do serwera o zmiane hasła na nowe: {new_password}")
-        return
+
+        url = self.URLs[0] + '/chat/password/change/'
+        headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
+        r = requests.post(url, headers=headers, data={'new_passw': new_password})
 
     def pop_alert(self, text):
         msg = QMessageBox()

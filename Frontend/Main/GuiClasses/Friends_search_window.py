@@ -1,3 +1,4 @@
+import requests
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QMessageBox
 from SidePackage.Error import pop_alert
@@ -32,12 +33,18 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
 
     def search_friends(self):
         self.users = []
-        # Todo: Send request to server to get list of friends (index + (string) name)
+        self.listWidget_users.clear()
+        # Todo: Check if string is not empty
         string = self.lineEdit_to_search.text()
-        respond = []
-        self.users = []
+        url = self.URLs[0] + '/chat/search/'
+        headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
+        r = requests.get(url, headers=headers, data={'key': string})
+        respond = r.json()['content']
+
+        self.users = respond
+        print(self.users)
         for f in self.users:
-            self.add_element(f[1])
+            self.add_element(f['username'])
 
     def user_clicked(self, item):
         pass
@@ -56,8 +63,8 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
             self.add_friend(item)
 
     def add_friend(self, item):
-        # Todo: send request to server to add user to friends, id == id
-        row = self.listWidget_users.row(self.listWidget_friends.currentItem())
-        id = self.users[row][1]
+        row = self.listWidget_users.row(self.listWidget_users.currentItem())
+        id = self.users[row]['id']
+        self.MainWindow.send_friend_request(id)
 
 

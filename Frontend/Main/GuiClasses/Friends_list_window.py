@@ -1,3 +1,4 @@
+import requests
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QMessageBox
 from random import randint
@@ -17,7 +18,6 @@ class FriendsListWindow(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.listWidget_friends = self.findChild(QtWidgets.QListWidget, 'listWidget_friends')
-
         self.listWidget_friends.itemClicked.connect(self.friend_clicked)
         self.listWidget_friends.itemDoubleClicked.connect(self.friend_double_clicked)
 
@@ -35,11 +35,19 @@ class FriendsListWindow(QtWidgets.QMainWindow):
         del self.friends_list[row]
 
     def get_friends(self):
-        # todo: send request to server to get friends list (index + (string) name)
         self.friends_list = []
-        self.friends_list.sort(key=lambda f: f[1])
+        self.listWidget_friends.clear()
+        url = self.URLs[0] + '/chat/contacts/'
+        headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
+        r = requests.get(url, headers=headers)
+        respond = r.json()['content']
+        self.friends_list = respond['friends']
+        self.friends_list.sort(key=lambda f: f['username'])
+
+        print(self.friends_list)
         for f in self.friends_list:
-            self.add_element(f[1])
+            self.add_element(f['username'])
+            print(f)
 
     def friend_clicked(self, item):
         # todo: ?????????????????????
@@ -60,12 +68,13 @@ class FriendsListWindow(QtWidgets.QMainWindow):
 
     def remove_friend(self, item):
         print(f"Usuwam {item.text()}")
-        # todo: Send request to server to delete user, where id == id
         row = self.listWidget_friends.row(self.listWidget_friends.currentItem())
-        id = self.friends_list[row][1]
+        username = self.friends_list[row]['username']
 
-        # request to server (id)
-        respond = True
-        if respond:
-            self.remove_element()
+        url = self.URLs[0] + '/chat/friends/remove/'
+        headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
+        r = requests.post(url, headers=headers, data={'username': username})
+
+        if r:
+            self.get_friends()
 

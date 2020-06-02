@@ -18,9 +18,14 @@ class KeyManager():
             self.keys = json.load(infile)
 
         self.initialised_dh = {}
+        self.currently_generating_keys = []
 
     def contains_conversation(self, conversation_id):
         return str(conversation_id) in self.keys
+
+    def start_generating_key(self, conversation_id):
+        if conversation_id not in self.currently_generating_keys:
+            self.currently_generating_keys.append(conversation_id)
 
     def add_key(self, conversation_id, key):
         if str(conversation_id) not in self.keys:
@@ -38,6 +43,9 @@ class KeyManager():
 
             with open(self.filename, 'w') as outfile:
                 json.dump(self.keys, outfile)
+
+            if conversation_id in self.currently_generating_keys:
+                self.currently_generating_keys.remove(conversation_id)
 
     def get_key(self, conversation_id):
         return self.keys.get(str(conversation_id), None)

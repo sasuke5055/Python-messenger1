@@ -28,7 +28,12 @@ urlpatterns = [
    path('contacts/', views.ContactsView.as_view(), name='contacts'),
    path('conversations/',views.ConversationsView.as_view(), name='conversations'),
    path('messages/<pk>', views.ConversationMessagesView.as_view(), name='messages'),
+   path('search/', views.SearchView.as_view(), name='search'),
+   path('notifications/', views.NotificationsView.as_view(), name='notifications'),
+   path('friends/remove/', views.ContactsView.as_view(), name='remove_friend'),
+   path('password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
 ]

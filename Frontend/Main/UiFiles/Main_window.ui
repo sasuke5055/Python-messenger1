@@ -10,6 +10,24 @@
     <height>650</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>880</width>
+    <height>650</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>880</width>
+    <height>650</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>PeaChat</string>
   </property>
@@ -116,6 +134,7 @@
     </property>
     <addaction name="action_friens_list"/>
     <addaction name="action_find_friends"/>
+    <addaction name="action_invitations_list"/>
    </widget>
    <widget class="QMenu" name="menuKonwersacje">
     <property name="title">
@@ -145,6 +164,11 @@
   <action name="action_find_friends">
    <property name="text">
     <string>Szukaj znajomych</string>
+   </property>
+  </action>
+  <action name="action_invitations_list">
+   <property name="text">
+    <string>Zaproszenia</string>
    </property>
   </action>
  </widget>
