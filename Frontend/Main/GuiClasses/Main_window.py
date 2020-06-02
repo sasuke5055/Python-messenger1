@@ -52,9 +52,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup_contacts()
         self.show()
 
-    
-
-
     def connect_to_socket(self):
         address = self.URLs[1] + "/ws/chat/xd/"
         self.messenger = Messenger()
@@ -337,7 +334,7 @@ class MainWindow(QtWidgets.QMainWindow):
         url = self.URLs[0]+'/chat/messages/'+str(conversation_id)
         print(url)
         headers = {'Authorization': 'Token '+self.token_id}
-        r = requests.get(url, headers=headers, data = {'start': starting_pos, 'end': 1})
+        r = requests.get(url, headers=headers, data={'start': starting_pos, 'end': 1})
         d = list()
         temp_messages = list()
         data = r.json()['content']
@@ -414,7 +411,7 @@ class MainWindow(QtWidgets.QMainWindow):
         request_id = int(data['request_id'])
         sender_name = data['sender']
         timestamp = data['timestamp']
-        pop_alert("Nowe Zaproszenie!")
+        pop_alert(f"Nowe Zaproszenie od {sender_name}")
 
         # TODO akceptacja/odrzucenie requesta na https
         # TODO możee po prostu robić powiadomienie i weźmiesz sobie ostatniego requesta z bazy
@@ -425,12 +422,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def friend_req_repsponse(self, data):
         friend_name = data['sender']
         if data['response'] == 'True':
-            pop_alert("Ktoś Cię dodał do znajomych!")
+            pop_alert(f"{friend_name} Cię dodał do znajomych!")
             self.setup_contacts()
 
 
         else:
-            pop_alert("Ktoś Cię odrzucił")
+            pop_alert(f"{friend_name} Cię odrzucił")
         pass
 
     def send_friend_req_response(self, req_id, response):

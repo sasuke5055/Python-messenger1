@@ -123,8 +123,7 @@ class ChatConsumer(WebsocketConsumer):
             )
         elif type == 'invite_friend':
             print('wchodze do invitefr')
-            friend_id = text_data_json['friend_id']
-            friend_id = int(friend_id)
+            friend_id = int(text_data_json['friend_id'])
             receiver = User.objects.get(pk=friend_id)
             print(receiver)
             notifications = receiver.notifications.get()
@@ -133,10 +132,13 @@ class ChatConsumer(WebsocketConsumer):
             # todo: here changed
             if not FriendRequest.objects.filter(user=notifications,
                                                 sender=self.user).exists():
-                notifications = receiver.notifications.get()
+                request = create_friend_request(notifications, self.user)
+                # notifications = receiver.notifications.get()
+            else:
+                request = FriendRequest.objects.get(user=notifications, sender=self.user)
                 print(receiver)
             print('dupaduap')
-            request = create_friend_request(notifications, self.user)
+            
             room_group_name = f'chat_{friend_id}'
             async_to_sync(self.channel_layer.group_send)(
                 room_group_name,
@@ -156,7 +158,7 @@ class ChatConsumer(WebsocketConsumer):
                 conversation = accept_friend(self.user, f_request.sender, f_request)
                 if conversation is not None:
                     self.notify_conversation_admin(conversation) #TA LINIJKA JEST WAŻNA / VERY IMPORTANT LINE 
-            elif response == "False":
+            elif response == 'False':
                 reject_friend(f_request)
             room_group_name = f'chat_{f_request.sender.id}'
             async_to_sync(self.channel_layer.group_send)(

@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
 
 User = get_user_model()
+
 # executes when new user signed up
 @receiver(user_signed_up)
 def after_user_signed_up(request, user, **kwargs):
@@ -108,14 +109,6 @@ class FriendRequest(models.Model):
     sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
     sender_name = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now_add=True)
-    notify_type = models.CharField(max_length=20, blank=True)
-
-    if User == sender:
-        notify_type = 'request invite'
-    else:
-        notify_type = 'request accept'
 
     def __str__(self):
-        return f"type: {self.notify_type}, from: {self.sender}, to: {self.user.user}"
-
-
+        return f"from: {self.sender}, to: {self.user.user}"

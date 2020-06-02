@@ -34,7 +34,6 @@ def create_friend_request(notifications_set: Notifications, sender: User):
     print(e)
     return None
 
-
 def accept_friend(user: User, friend: User, request: FriendRequest):
   try:
     user.contact.get().friends.add(friend)
@@ -42,7 +41,8 @@ def accept_friend(user: User, friend: User, request: FriendRequest):
     user.save()
     friend.save()
     # check if that two users were friends in past
-    title=f"{user.username}, {friend.username}"
+    sorted_names = sorted([user.username, friend.username])
+    title=f"{sorted_names[0]}, {sorted_names[1]}"
     conversation = create_new_conversation(title, user) 
     if conversation is not None:
       add_user_to_conversation(friend, conversation)
