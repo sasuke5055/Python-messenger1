@@ -4,7 +4,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
 from .serializers import MessageSerializer
-from .utils import create_message, create_friend_request, accept_friend, reject_friend
+from .utils import create_message, create_friend_request, accept_friend, reject_friend, create_new_conversation, add_user_to_conversation
 from .models import Conversation, UserConversation, FriendRequest, User
 from rest_framework.authtoken.models import Token
 
@@ -167,6 +167,27 @@ class ChatConsumer(WebsocketConsumer):
                     'response': response,
                 }
             )
+        elif type == 'create_group':
+            title = text_data_json['title']
+            admin_id = int(text_data_json['admin_id'])
+            users = text_data_json['users_ids']
+            admin = User.objects.get(pk=admin_id)
+            conv = create_new_conversation(title, admin, False)
+            self.notify_conversation_admin(conv)
+            for user_id in users:
+                user = User.objects.get(pk=int(user_id))
+                add_user_to_conversation(user, conv)
+
+                room_group_name = f'chat_{int(user_id)}'
+                async_to_sync(self.channel_layer.group_send)(
+                    room_group_name,
+                    {
+                        'type': 'created_group_notify',
+                        'title': title,
+                        'admin_name': admin.username,
+                    }
+                )
+            
 
 
     # Receive message from room group
@@ -255,6 +276,17 @@ class ChatConsumer(WebsocketConsumer):
             'type': 'new_conversation',
             'conversation_id': conversation_id,
         })))
+
+    def created_group_notify(self, event):
+        title = event['title']
+        admin_name = event['admin_name']
+        async_to_sync(self.send(text_data=json.dumps({
+            'type': 'create_group_notify',
+            'title': title,
+            'admin': admin_name,
+        })))
+
+
 
 # class ChatConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):

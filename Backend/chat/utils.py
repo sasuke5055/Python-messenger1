@@ -52,9 +52,9 @@ def accept_friend(user: User, friend: User, request: FriendRequest):
     print(e)
     return None
 
-def create_new_conversation(title, admin : User):
+def create_new_conversation(title, admin : User, typ=True):
   if not Conversation.objects.filter(title=title,
-                                   is_private=True
+                                   is_private=typ
                                    ).exists():
       print(f"accepted and create new conv")
       conversation = Conversation.objects.create(title=title, admin=admin)

@@ -6,6 +6,7 @@ from .Change_password_window import ChangePasswordWindow
 from .Friends_list_window import FriendsListWindow
 from .Friends_search_window import FriendsSearchWindow
 from .Friends_invitations_window import FriendsInvitationsWindows
+from .Groups_window import GroupsWindow
 
 import requests
 from .messaging import Messenger
@@ -68,6 +69,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messenger.add_callback_new_friend_request(self.handle_friend_request)
         self.messenger.add_callback_friend_req_response(self.friend_req_repsponse)
         self.messenger.add_callback_conversation_created(self.new_conversation_created)
+        self.messenger.add_callback_new_group_created(self.handle_responses)
         
     def initUi(self):
         self.button_send_message = self.findChild(QtWidgets.QPushButton, 'button_send_message')
@@ -104,10 +106,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.action_friens_list = self.findChild(QtWidgets.QAction, 'action_friens_list')
         self.action_find_friends = self.findChild(QtWidgets.QAction, 'action_find_friends')
         self.action_invitations_list = self.findChild(QtWidgets.QAction, 'action_invitations_list')
+        self.action_new_conversation = self.findChild(QtWidgets.QAction, 'action_nowa_konwersacja')
         self.action_friens_list.triggered.connect(self.open_friends_list_window)
         self.action_find_friends.triggered.connect(self.open_friends_search_window)
         self.action_invitations_list.triggered.connect(self.open_fiends_invitations_windows)
-
+        self.action_new_conversation.triggered.connect(self.open_groups_windows)
     def setup_contacts(self):
         " show all contacs and groups of yours "
         self.list_contacts.clear()
@@ -147,7 +150,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_contact = contact
 
         conversation_id = self.conversation_ids[contact]
-
+        print(conversation_id)
+        self.request_key(conversation_id)
+        print(self.key_manager.contains_conversation(conversation_id))
         if not self.key_manager.contains_conversation(conversation_id):  # send a request for the RSA key
             self.request_key(conversation_id)
             pop_alert("Poczekaj na wygenerowanie")
@@ -297,6 +302,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         conversation_id = self.conversation_ids[contact]
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
+        if rsa_manager is None:
+            print("RSA NONE!"*100)
 
         url = self.URLs[0] + '/chat/messages/' + str(conversation_id)
         headers = {'Authorization': 'Token ' + self.token_id}
@@ -408,6 +415,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = FriendsInvitationsWindows(self, self.URLs)
         self.setDisabled(True)
 
+    def open_groups_windows(self):
+        self.ui = GroupsWindow(self,self.URLs)
+        self.setDisabled(True)
+        
+
     # Todo: Przyszło zaproszenie
     def handle_friend_request(self, data):
         print(data)
@@ -422,16 +434,25 @@ class MainWindow(QtWidgets.QMainWindow):
     def send_friend_request(self, id):
         self.messenger.send_friend_request(id)
 
+
+    def handle_responses(self, data):
+        print("XD"*100)
+        admin_name = data['admin']
+        title = data['title']
+        pop_alert(f"{admin_name} Cię dodał do grupy {title}!")
+        self.setup_contacts()
+        
+
     def friend_req_repsponse(self, data):
         friend_name = data['sender']
         if data['response'] == 'True':
-            pop_alert("Ktoś Cię dodał do znajomych!")
+            pop_alert(f"{friend_name} Cię dodał do znajomych!")
             self.setup_contacts()
 
 
         else:
-            pop_alert("Ktoś Cię odrzucił")
-        pass
+            pop_alert(f"{friend_name} Cię odrzucił")
+        
 
     def send_friend_req_response(self, req_id, response):
         self.messenger.send_f_req_response(req_id, response)
