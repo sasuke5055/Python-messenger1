@@ -50,8 +50,12 @@ class ConversationMessagesView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
+        print("XD1", request.data['start'])
+        print("XD2",request.data['end'])
+        start = int(request.data['start'])
+        end = int(request.data['end'])
         conversation = Conversation.objects.get(id=pk)
-        content = {'content':MessageSerializer(conversation.get_last_messages(0,20), many=True).data}
+        content = {'content':MessageSerializer(conversation.get_last_messages(start,end), many=True).data}
         return Response(content)
 
 class CustomObtainAuthToken(ObtainAuthToken):
