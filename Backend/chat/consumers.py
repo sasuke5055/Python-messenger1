@@ -80,9 +80,9 @@ class ChatConsumer(WebsocketConsumer):
             conversation_id = text_data_json['conversation_id']
             conversation = Conversation.objects.get(pk=conversation_id)
             userConversation = UserConversation.objects.get(user=self.user, conversation=conversation)
-            userConversation.is_listening = not userConversation.is_listening
+            userConversation.is_listening = True
+            #TODO: add closing conversation
             userConversation.save()
-            # TODO - add close convesation
         elif type == 'key_request':
             print('GOT KEY REQUEST')
             conversation_id = text_data_json['conversation_id']
@@ -137,7 +137,7 @@ class ChatConsumer(WebsocketConsumer):
                 print(receiver)
             print('dupaduap')
             request = create_friend_request(notifications, self.user)
-            room_group_name = f'chat_{self.user.pk}'
+            room_group_name = f'chat_{friend_id}'
             async_to_sync(self.channel_layer.group_send)(
                 room_group_name,
                 {
@@ -153,10 +153,12 @@ class ChatConsumer(WebsocketConsumer):
             response = text_data_json['response']
             f_request = FriendRequest.objects.get(id=request_id)
             if response == 'True':
-                accept_friend(self.user, f_request.sender, f_request)
+                conversation = accept_friend(self.user, f_request.sender, f_request)
+                if conversation is not None:
+                    self.notify_conversation_admin(conversation) #TA LINIJKA JEST WAŻNA / VERY IMPORTANT LINE 
             elif response == "False":
                 reject_friend(f_request)
-            room_group_name = f'chat_{f_request.sender.username}'
+            room_group_name = f'chat_{f_request.sender.id}'
             async_to_sync(self.channel_layer.group_send)(
                 room_group_name,
                 {
@@ -236,6 +238,22 @@ class ChatConsumer(WebsocketConsumer):
             'type': 'response_f_request',
             'sender': sender,
             'response': response,
+        })))
+
+    def notify_conversation_admin(self, conversation : Conversation):
+        room_group_name = f'chat_{conversation.admin.pk}'
+        async_to_sync(self.channel_layer.group_send)(
+            room_group_name,
+            {
+                'type': 'new_conversation',
+                'conversation_id': conversation.id,
+            }
+        )
+    def new_conversation(self,event):
+        conversation_id = event['conversation_id']
+        async_to_sync(self.send(text_data=json.dumps({
+            'type': 'new_conversation',
+            'conversation_id': conversation_id,
         })))
 
 # class ChatConsumer(AsyncWebsocketConsumer):

@@ -42,19 +42,26 @@ def accept_friend(user: User, friend: User, request: FriendRequest):
     user.save()
     friend.save()
     # check if that two users were friends in past
-    if not Conversation.objects.filter(title=f"{user.username}, {friend.username}",
-                                       is_private=True
-                                       ).exists():
-      print(f"accepted and create new conw")
-      conversation = Conversation.objects.create(title=f"{user.username}, {friend.username}")
-      conversation.save()
-      add_user_to_conversation(user, conversation)
+    title=f"{user.username}, {friend.username}"
+    conversation = create_new_conversation(title, user) 
+    if conversation is not None:
       add_user_to_conversation(friend, conversation)
     request.delete()
-    return True
+    return conversation
   except Exception as e:
     print(e)
-    return False
+    return None
+
+def create_new_conversation(title, admin : User):
+  if not Conversation.objects.filter(title=title,
+                                   is_private=True
+                                   ).exists():
+      print(f"accepted and create new conv")
+      conversation = Conversation.objects.create(title=title, admin=admin)
+      conversation.save()
+      add_user_to_conversation(admin, conversation)
+      return conversation
+  return None
 
 
 def reject_friend(request: FriendRequest):

@@ -20,8 +20,9 @@ class Messenger(QtCore.QObject):
         self.callback_new_message_reveiced = []
         self.callback_new_key_request = []
         self.callback_new_key_response = []
-        self.callback_new_friend_request = []
+        self.callback_new_friend_request = [] 
         self.callback_friend_req_response = []
+        self.callback_conversation_created = []
 
     def add_callback_new_message_received(self, f):
         self.callback_new_message_reveiced.append(f)
@@ -37,9 +38,14 @@ class Messenger(QtCore.QObject):
 
     def add_callback_friend_req_response(self, f):
         self.callback_friend_req_response.append(f)
+    
+    def add_callback_conversation_created(self,f):
+        self.callback_conversation_created.append(f)
 
     def on_message(self, data):
+        print("cokolwiek")
         data = json.loads(data)
+        print(data)
         if(data['type'] == 'new_message'):
             for f in self.callback_new_message_reveiced:
                 f(data)
@@ -59,7 +65,11 @@ class Messenger(QtCore.QObject):
         elif data['type'] == 'response_f_request':
             for f in self.callback_friend_req_response:
                 f(data)
-            #self.f_request_response_signal.emit()
+                
+        elif data['type'] == 'new_conversation':
+            for f in self.callback_conversation_created:
+                f(data)
+            
 
 
                 
@@ -126,5 +136,7 @@ class Messenger(QtCore.QObject):
             'id': request_id,
             'response': response,
         }
+        print(data)
+        print(json.dumps(data))
         self.sub_socket.send(json.dumps(data))
 

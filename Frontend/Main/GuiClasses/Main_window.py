@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtGui import QFont
 from SidePackage.Error import pop_alert
-
+import time
 from .Change_password_window import ChangePasswordWindow
 from .Friends_list_window import FriendsListWindow
 from .Friends_search_window import FriendsSearchWindow
@@ -42,6 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.user_id = user_id
         self.URLs = URLs
         self.conversation_ids = dict()
+        #TODO: WYWALIĆ INITIALISED
         self.initialised_conversations = []
 
         self.connect_to_socket()
@@ -67,7 +68,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messenger.add_callback_new_key_response(self.handle_key_response)
         self.messenger.add_callback_new_friend_request(self.handle_friend_request)
         self.messenger.add_callback_friend_req_response(self.friend_req_repsponse)
-
+        self.messenger.add_callback_conversation_created(self.new_conversation_created)
+        
     def initUi(self):
         self.button_send_message = self.findChild(QtWidgets.QPushButton, 'button_send_message')
         self.button_send_message.clicked.connect(self.send_new_message)
@@ -109,6 +111,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setup_contacts(self):
         " show all contacs and groups of yours "
+        self.list_contacts.clear()
         for contact in self.get_contacts():
             new_item = QtWidgets.QListWidgetItem()
             new_item.setText(contact)
@@ -129,6 +132,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if not self.key_manager.contains_conversation(conversation_id):  # send a request for the RSA key
             self.request_key(conversation_id)
+            pop_alert("Poczekaj na wygenerowanie")
             # TODO we must wait for the key from conversation admin, leave this function/tell user about it
 
         self.list_messages.clear()
@@ -210,12 +214,14 @@ class MainWindow(QtWidgets.QMainWindow):
         dh_local.gen_private_key(dh_external_key)  # dh_local can now encrypt our rsa key
 
         rsa_key = self.key_manager.get_key(conversation_id)
-        if rsa_key == None:  # serious error, rsa keys should be added just after creating the new conversation
+        if rsa_key == None and conversation_id not in self.key_manager.currently_generating_keys:  # serious error, rsa keys should be added just after creating the new conversation
             # raise Exception("Admin doesn't have key!")
             # TODO delete code below
+            self.key_manager.start_generating_key(conversation_id)
             new_key = self.key_manager.generate_key()
             self.key_manager.add_key(conversation_id, new_key)
             rsa_key = self.key_manager.get_key(conversation_id)
+            self.setup_contacts()
 
         encrypted_rsa_key = dh_local.encrypt_key(rsa_key['rsa_key'])  # this is a dictionary
         self.messenger.send_key_response(conversation_id, user_id, dh_local_key, encrypted_rsa_key)
@@ -233,7 +239,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key)  # this is rsa.PrivateKey object
             self.key_manager.add_key(conversation_id, decrypted_rsa_key)
-            # TODO do something after we receive the key
+            self.setup_contacts()
 
     def request_key(self, conversation_id):
         print('IM REQUESTING A KEY')
@@ -251,10 +257,10 @@ class MainWindow(QtWidgets.QMainWindow):
             rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
             if rsa_manager != None:
                 text = rsa_manager.encrypt(text)
-
-            self.messenger.publish_message(text, conversation_id)
+                self.messenger.publish_message(text, conversation_id)
 
     def get_contacts(self):
+        self.conversation_ids.clear()
         url = self.URLs[0] + '/chat/conversations/'
         headers = {'Authorization': 'Token ' + self.token_id}
         r = requests.get(url, headers=headers)
@@ -343,7 +349,7 @@ class MainWindow(QtWidgets.QMainWindow):
         request_id = int(data['request_id'])
         sender_name = data['sender']
         timestamp = data['timestamp']
-        pop_alert("Nowe Zaproszenie!!!!!!!!!!!!!!111")
+        pop_alert("Nowe Zaproszenie!")
 
         # TODO akceptacja/odrzucenie requesta na https
         # TODO możee po prostu robić powiadomienie i weźmiesz sobie ostatniego requesta z bazy
@@ -354,10 +360,22 @@ class MainWindow(QtWidgets.QMainWindow):
     def friend_req_repsponse(self, data):
         friend_name = data['sender']
         if data['response'] == 'True':
-            pop_alert("Ktoś mie dodał do znajomych")
+            pop_alert("Ktoś Cię dodał do znajomych!")
+            self.setup_contacts()
+
+
         else:
-            pop_alert("Ktoś mnie odrzucił")
+            pop_alert("Ktoś Cię odrzucił")
         pass
 
     def send_friend_req_response(self, req_id, response):
         self.messenger.send_f_req_response(req_id, response)
+
+    def new_conversation_created(self, data):
+        conversation_id = data['conversation_id']
+        print(f"ADMIN GENERUJE KLUCZ DO {conversation_id}")
+        self.key_manager.start_generating_key(conversation_id)
+        new_key = self.key_manager.generate_key()
+        self.key_manager.add_key(conversation_id, new_key)
+
+        self.setup_contacts()
