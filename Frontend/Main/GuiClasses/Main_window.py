@@ -254,6 +254,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.messenger.publish_message(text, conversation_id)
 
+
     def get_contacts(self):
         url = self.URLs[0] + '/chat/conversations/'
         headers = {'Authorization': 'Token ' + self.token_id}
