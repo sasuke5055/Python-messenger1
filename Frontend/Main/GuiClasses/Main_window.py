@@ -263,7 +263,7 @@ class MainWindow(QtWidgets.QMainWindow):
             dh = self.key_manager.get_dh(conversation_id)
             dh.gen_private_key(dh_key)  # now dh can decrypt RSA key
 
-            encrypted_flag = data['flag']
+            encrypted_flag = int(data['flag'])
             decrypted_flag = dh.decrypt_message(encrypted_flag)
             if flag == decrypted_flag:
                 decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key)  # this is rsa.PrivateKey object

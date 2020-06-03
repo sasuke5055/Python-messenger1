@@ -120,7 +120,7 @@ class ChatConsumer(WebsocketConsumer):
                     'conversation_id': conversation_id,
                     'dh_key': str(dh_key),
                     'rsa_key': rsa_key,
-                    'flag': flag,
+                    'flag': str(flag),
                 }
             )
         elif type == 'invite_friend':
