@@ -15,7 +15,7 @@ from .Managers.KeyManager import KeyManager
 # TODO kluczami messages powinny być id konwersacji
 messages = {}
 username = "Ty"
-
+flag = 17843 
 
 def split_message(message, count=26):
     """split words to have at maximum 'count' characters """
@@ -224,6 +224,7 @@ class MainWindow(QtWidgets.QMainWindow):
         pass
 
     def handle_key_request(self, data):  # current user is an admin, and we should send the key
+        global flag
         # TODO notify user about it and let him decide
         print('NEW KEY REQUEST!')
         print()
@@ -246,10 +247,12 @@ class MainWindow(QtWidgets.QMainWindow):
             rsa_key = self.key_manager.get_key(conversation_id)
             self.setup_contacts()
 
-        encrypted_rsa_key = dh_local.encrypt_key(rsa_key['rsa_key'])  # this is a dictionary
-        self.messenger.send_key_response(conversation_id, user_id, dh_local_key, encrypted_rsa_key)
+        encrypted_rsa_key = dh_local.encrypt_key(rsa_key['rsa_key'])  # this is a dictionary    
+        encrypted_flag    = dh_local.encrypt_message(flag)
+        self.messenger.send_key_response(conversation_id, user_id, dh_local_key, encrypted_rsa_key, encrypted_flag)
 
     def handle_key_response(self, data):
+        global flag
         print('NEW KEY RESPONSE!')
         print()
         conversation_id = data['conversation_id']
@@ -260,9 +263,14 @@ class MainWindow(QtWidgets.QMainWindow):
             dh = self.key_manager.get_dh(conversation_id)
             dh.gen_private_key(dh_key)  # now dh can decrypt RSA key
 
-            decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key)  # this is rsa.PrivateKey object
-            self.key_manager.add_key(conversation_id, decrypted_rsa_key)
-            self.setup_contacts()
+            encrypted_flag = data['flag']
+            decrypted_flag = dh.decrypt_message(encrypted_flag)
+            if flag == decrypted_flag:
+                decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key)  # this is rsa.PrivateKey object
+                self.key_manager.add_key(conversation_id, decrypted_rsa_key)            
+                self.setup_contacts()
+            else:
+                print('INCORRECT DIFFIE HELLMAN ENCODING')
 
     def request_key(self, conversation_id):
         print('IM REQUESTING A KEY')

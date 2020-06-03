@@ -109,6 +109,7 @@ class ChatConsumer(WebsocketConsumer):
             user_id = text_data_json['user_id']
             dh_key = text_data_json['dh_key']
             rsa_key = text_data_json['rsa_key']
+            flag = text_data_json['flag']
 
             room_group_name = 'chat_%s' % user_id
             async_to_sync(self.channel_layer.group_send)(
@@ -118,7 +119,8 @@ class ChatConsumer(WebsocketConsumer):
                     'user_id': user_id,
                     'conversation_id': conversation_id,
                     'dh_key': str(dh_key),
-                    'rsa_key': rsa_key
+                    'rsa_key': rsa_key,
+                    'flag': flag,
                 }
             )
         elif type == 'invite_friend':
@@ -220,12 +222,14 @@ class ChatConsumer(WebsocketConsumer):
         conversation_id = event['conversation_id']
         dh_key = event['dh_key']
         rsa_key = event['rsa_key']
+        flag = event['flag']
         async_to_sync(self.send(text_data=json.dumps({
             'type': 'key_response',
             'user_id': user_id,
             'conversation_id': conversation_id,
             'dh_key': dh_key,
-            'rsa_key': rsa_key
+            'rsa_key': rsa_key,
+            'flag': flag,
         })))
 
     def message(self, event):

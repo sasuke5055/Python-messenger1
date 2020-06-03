@@ -118,13 +118,14 @@ class Messenger(QtCore.QObject):
             }
         self.sub_socket.send(json.dumps(data))
 
-    def send_key_response(self, conversation_id, user_id, dh_key, rsa_key):
+    def send_key_response(self, conversation_id, user_id, dh_key, rsa_key, flag):
         data = {
                 'type': 'key_response',
                 'conversation_id': conversation_id,
                 'user_id': user_id,
                 'dh_key': dh_key,
-                'rsa_key': rsa_key
+                'rsa_key': rsa_key,
+                'flag': flag,
             }
         self.sub_socket.send(json.dumps(data))
 
