@@ -135,10 +135,12 @@ class ChatConsumer(WebsocketConsumer):
             # todo: here changed
             if not FriendRequest.objects.filter(user=notifications,
                                                 sender=self.user).exists():
-                notifications = receiver.notifications.get()
+                request = create_friend_request(notifications, self.user)
+                # notifications = receiver.notifications.get()
+            else:
+                request = FriendRequest.objects.get(user=notifications, sender=self.user)
                 print(receiver)
             print('dupaduap')
-            request = create_friend_request(notifications, self.user)
             room_group_name = f'chat_{friend_id}'
             async_to_sync(self.channel_layer.group_send)(
                 room_group_name,

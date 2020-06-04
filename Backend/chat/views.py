@@ -75,10 +75,10 @@ class SearchView(APIView):
         matching_friends = request.user.contact.get().friends.filter(username__icontains=key)
         friends = [x.username for x in matching_friends]
         # getting users who are not your friends
-        users = User.objects.exclude().filter(username__icontains=key).exclude(username__in=friends)
-
+        users = User.objects.filter(username__icontains=key).exclude(username__in=friends).exclude(pk=request.user.pk)
         matching_friends = UserSerializer(matching_friends, many=True).data
         strangers = UserSerializer(users, many=True).data
+        print(matching_friends + strangers)
         content = {'content': matching_friends + strangers}
         return Response(content)
 
