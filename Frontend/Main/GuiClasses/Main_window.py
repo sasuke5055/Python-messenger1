@@ -156,6 +156,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if not self.key_manager.contains_conversation(conversation_id):  # send a request for the RSA key
             self.request_key(conversation_id)
             pop_alert("Poczekaj na wygenerowanie")
+            return
             # TODO we must wait for the key from conversation admin, leave this function/tell user about it
 
         if contact not in self.initialised_conversations:
@@ -386,8 +387,6 @@ class MainWindow(QtWidgets.QMainWindow):
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
         if rsa_manager != None:
             content = rsa_manager.decrypt(content)
-
-
         return content
 
     def append_new_message(self, message):
@@ -465,6 +464,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def send_friend_req_response(self, req_id, response):
         self.messenger.send_f_req_response(req_id, response)
 
+    
     def new_conversation_created(self, data):
         conversation_id = data['conversation_id']
         print(f"ADMIN GENERUJE KLUCZ DO {conversation_id}")
