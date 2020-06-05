@@ -4,7 +4,7 @@ from GuiClasses.Main_window import MainWindow
 from GuiClasses.Forgot_password_window import ForgotWindow
 from GuiClasses.Register_window import RegisterWindow
 from SidePackage.Error import pop_alert
-
+import time
 import requests
 
 
@@ -26,7 +26,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         self.lineEdit_username = self.findChild(QtWidgets.QLineEdit, 'lineEdit_username')
         self.lineEdit_password = self.findChild(QtWidgets.QLineEdit, 'lineEdit_password')
         self.checkBox_remember = self.findChild(QtWidgets.QCheckBox, 'checkBox_remember')
-
+        self.opened_main_window = False 
         self.button_login.pressed.connect(self.login_button_pressed)
         self.button_forgot.pressed.connect(self.forgot_button_pressed)
         self.button_register.pressed.connect(self.register_button_pressed)
@@ -62,7 +62,10 @@ class LoginWindow(QtWidgets.QMainWindow):
                 data = r.json()
                 token = data["token"]
                 user_id = data["user_id"]
-                self.open_main_window(token, user_id)
+                if not self.opened_main_window:
+                    self.open_main_window(token, user_id)
+                self.opened_main_window = True
+
             else:
                 pop_alert("Niepoprawne dane logowania!")
         except requests.ConnectionError:
@@ -113,6 +116,7 @@ class LoginWindow(QtWidgets.QMainWindow):
     def open_main_window(self, token_id, user_id):
         print('Opening main window')
         # open new window
+        print("SIEMA")
         self.ui = MainWindow(token_id, user_id, self.URLs)
 
     def validate_data(self, login, password):

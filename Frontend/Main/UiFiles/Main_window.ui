@@ -118,7 +118,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_profile">
@@ -140,6 +140,7 @@
     <property name="title">
      <string>Konwersacje</string>
     </property>
+    <addaction name="action_nowa_konwersacja"/>
    </widget>
    <addaction name="menu_profile"/>
    <addaction name="menu_friends"/>
@@ -169,6 +170,16 @@
   <action name="action_invitations_list">
    <property name="text">
     <string>Zaproszenia</string>
+   </property>
+  </action>
+  <action name="actionStw_rz_now">
+   <property name="text">
+    <string>Stwórz nową</string>
+   </property>
+  </action>
+  <action name="action_nowa_konwersacja">
+   <property name="text">
+    <string>nowa konwersacja</string>
    </property>
   </action>
  </widget>
