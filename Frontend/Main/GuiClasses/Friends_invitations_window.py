@@ -71,7 +71,6 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
 
         self.invitations_list = respond
         self.invitations_list.sort(key=lambda f: f['timestamp'])
-        print(self.invitations_list)
         for i in range(len(self.invitations_list)):
             f = self.invitations_list[i]
             self.add_element(f['sender_name'], i)
@@ -105,15 +104,13 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
 
     def add_friend(self, index):
         
-
-        print(f"Dodaje {index}")
         id = self.invitations_list[index]['id']
         self.MainWindow.send_friend_req_response(id, 'True')
         self.get_invitations()
         self.close()
 
     def remove_invitation(self, index):
-        print(f"Usuwam {index}")
+
         id = self.invitations_list[index]['id']
         self.MainWindow.send_friend_req_response(id, 'False')
         self.get_invitations()

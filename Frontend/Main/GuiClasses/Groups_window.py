@@ -36,7 +36,6 @@ class GroupsWindow(QtWidgets.QMainWindow):
 
     def get_checked_friends(self):
         conversation_name = self.lineEdit_name.text()
-        print(conversation_name)
         checked_ids = []
         for i in range(len(self.friends_list)):
             if self.model.item(i).checkState():
@@ -53,9 +52,7 @@ class GroupsWindow(QtWidgets.QMainWindow):
         self.friends_list = respond['friends']
         self.friends_list.sort(key=lambda f: f['username'])
 
-        print(self.friends_list)
         for f in self.friends_list:
             usr = f['username']
-            print(usr)
             self.add_element(f['username'])
 

@@ -44,13 +44,10 @@ class FriendsListWindow(QtWidgets.QMainWindow):
         self.friends_list = respond['friends']
         self.friends_list.sort(key=lambda f: f['username'])
 
-        print(self.friends_list)
         for f in self.friends_list:
             self.add_element(f['username'])
-            print(f)
 
     def friend_clicked(self, item):
-        # todo: ?????????????????????
         pass
 
     def friend_double_clicked(self, item):
@@ -67,7 +64,6 @@ class FriendsListWindow(QtWidgets.QMainWindow):
             self.remove_friend(item)
 
     def remove_friend(self, item):
-        print(f"Usuwam {item.text()}")
         row = self.listWidget_friends.row(self.listWidget_friends.currentItem())
         username = self.friends_list[row]['username']
 

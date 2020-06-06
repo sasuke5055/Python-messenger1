@@ -42,7 +42,6 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
         respond = r.json()['content']
 
         self.users = respond
-        print(self.users)
         for f in self.users:
             self.add_element(f['username'])
 

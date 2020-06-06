@@ -57,7 +57,6 @@ def create_new_conversation(title, admin : User, typ=True):
   if not Conversation.objects.filter(title=title,
                                    is_private=typ
                                    ).exists():
-      print(f"accepted and create new conv")
       conversation = Conversation.objects.create(title=title, admin=admin)
       conversation.save()
       add_user_to_conversation(admin, conversation)
