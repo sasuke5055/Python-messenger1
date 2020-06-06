@@ -6,12 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>329</height>
+    <width>344</width>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Moi znajomi</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#MainWindow{
+background-color: rgb(248, 222, 214);
+}
+#centralwidget{
+background-color: rgb(248, 222, 214);
+}
+#listWidget_friends{
+border-radius: 15px;
+font: &quot;Routed Gothic&quot;;
+background-color:white
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QListWidget" name="listWidget_friends">
@@ -19,8 +32,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>300</width>
-      <height>310</height>
+      <width>321</width>
+      <height>541</height>
      </rect>
     </property>
    </widget>

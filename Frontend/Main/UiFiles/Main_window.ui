@@ -1,38 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DzikBook</class>
- <widget class="QMainWindow" name="DzikBook">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>880</width>
-    <height>650</height>
+    <width>664</width>
+    <height>444</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>880</width>
-    <height>650</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>880</width>
-    <height>650</height>
-   </size>
-  </property>
   <property name="windowTitle">
-   <string>PeaChat</string>
+   <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">#MainWindow{
+background-color: rgb(248, 222, 214);
+}
+#centralwidget{
+background-color: rgb(248, 222, 214);
+}
+#button_send_message{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(249, 198, 171, 255), stop:1 rgba(232, 109, 52, 255));
+border-radius: 15px;
+font: bold 11pt &quot;Routed Gothic&quot;;
+color: white
+}
+#button_send_message:hover {
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(224, 149, 127, 255), stop:1 rgba(228, 78, 9, 255));
+}
+#text_new_message{
+border-radius: 15px;
+font: &quot;Routed Gothic&quot;;
+background-color:white
+}
+#list_messages{
+border-radius: 15px;
+font: &quot;Routed Gothic&quot;;
+background-color:white
+}
+#list_contacts{
+border-radius: 15px;
+font: &quot;Routed Gothic&quot;;
+background-color:white
+}
+#button_Logout{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(249, 198, 171, 255), stop:1 rgba(232, 109, 52, 255));
+border-radius: 8px;
+font: bold 9pt &quot;Routed Gothic&quot;;
+color: white
+}
+#button_Logout:hover {
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(224, 149, 127, 255), stop:1 rgba(228, 78, 9, 255));
+}
+#button_Settings{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(249, 198, 171, 255), stop:1 rgba(232, 109, 52, 255));
+border-radius: 8px;
+font: bold 9pt &quot;Routed Gothic&quot;;
+color: white
+}
+#button_Settings:hover {
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(224, 149, 127, 255), stop:1 rgba(228, 78, 9, 255));
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QListWidget" name="list_contacts">
@@ -40,25 +69,19 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>141</width>
-      <height>501</height>
+      <width>161</width>
+      <height>341</height>
      </rect>
     </property>
    </widget>
    <widget class="QListWidget" name="list_messages">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>180</x>
       <y>10</y>
-      <width>590</width>
-      <height>340</height>
+      <width>461</width>
+      <height>261</height>
      </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>590</width>
-      <height>340</height>
-     </size>
     </property>
     <property name="maximumSize">
      <size>
@@ -76,10 +99,10 @@
    <widget class="QTextEdit" name="text_new_message">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>370</y>
-      <width>591</width>
-      <height>141</height>
+      <x>180</x>
+      <y>280</y>
+      <width>461</width>
+      <height>71</height>
      </rect>
     </property>
     <property name="whatsThis">
@@ -87,15 +110,12 @@
     </property>
    </widget>
    <widget class="QPushButton" name="button_send_message">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>520</y>
-      <width>251</width>
-      <height>71</height>
+      <x>440</x>
+      <y>370</y>
+      <width>191</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -108,7 +128,33 @@
      <string notr="true"/>
     </property>
     <property name="text">
-     <string>Wyślij wiadomość</string>
+     <string>WYŚLIJ WIADOMOŚĆ</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_Logout">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>360</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>WYLOGUJ</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_Settings">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>380</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>USTAWIENIA</string>
     </property>
    </widget>
   </widget>
@@ -117,8 +163,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>880</width>
-     <height>21</height>
+     <width>664</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_profile">
@@ -128,23 +174,7 @@
     <addaction name="action_change_pass"/>
     <addaction name="action_change_infos"/>
    </widget>
-   <widget class="QMenu" name="menu_friends">
-    <property name="title">
-     <string>Znajomi</string>
-    </property>
-    <addaction name="action_friens_list"/>
-    <addaction name="action_find_friends"/>
-    <addaction name="action_invitations_list"/>
-   </widget>
-   <widget class="QMenu" name="menuKonwersacje">
-    <property name="title">
-     <string>Konwersacje</string>
-    </property>
-    <addaction name="action_nowa_konwersacja"/>
-   </widget>
    <addaction name="menu_profile"/>
-   <addaction name="menu_friends"/>
-   <addaction name="menuKonwersacje"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_change_pass">
@@ -155,31 +185,6 @@
   <action name="action_change_infos">
    <property name="text">
     <string>Zmiana danych</string>
-   </property>
-  </action>
-  <action name="action_friens_list">
-   <property name="text">
-    <string>Lista znajomych</string>
-   </property>
-  </action>
-  <action name="action_find_friends">
-   <property name="text">
-    <string>Szukaj znajomych</string>
-   </property>
-  </action>
-  <action name="action_invitations_list">
-   <property name="text">
-    <string>Zaproszenia</string>
-   </property>
-  </action>
-  <action name="actionStw_rz_now">
-   <property name="text">
-    <string>Stwórz nową</string>
-   </property>
-  </action>
-  <action name="action_nowa_konwersacja">
-   <property name="text">
-    <string>nowa konwersacja</string>
    </property>
   </action>
  </widget>
