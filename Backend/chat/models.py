@@ -8,10 +8,10 @@ User = get_user_model()
 @receiver(user_signed_up)
 def after_user_signed_up(request, user, **kwargs):
     # create contact model after registration
-    contact = Contact.objects.create(user=user)
+    Contact.objects.create(user=user)
 
     # create notifications model after registration
-    notifications = Notifications.objects.create(user=user)
+    Notifications.objects.create(user=user)
 
 
 class Contact(models.Model):
