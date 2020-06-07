@@ -50,8 +50,6 @@ class ConversationMessagesView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
-        print("XD1", request.data['start'])
-        print("XD2",request.data['end'])
         start = int(request.data['start'])
         end = int(request.data['end'])
         conversation = Conversation.objects.get(id=pk)
@@ -78,7 +76,6 @@ class SearchView(APIView):
         users = User.objects.filter(username__icontains=key).exclude(username__in=friends).exclude(pk=request.user.pk)
         matching_friends = UserSerializer(matching_friends, many=True).data
         strangers = UserSerializer(users, many=True).data
-        print(matching_friends + strangers)
         content = {'content': matching_friends + strangers}
         return Response(content)
 

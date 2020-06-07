@@ -13,7 +13,6 @@ class LoginWindow(QtWidgets.QMainWindow):
         super(LoginWindow, self).__init__()
         uic.loadUi('UiFiles/Login_window.ui', self)
         self.URLs = URLs
-        print(URLs)
 
         self.initUi()
 
@@ -48,15 +47,12 @@ class LoginWindow(QtWidgets.QMainWindow):
         else:
             self.delete_users_credentials()
 
-        # login using username and password
-        print(f"Login user {username} with password {password}")
 
         # try for present server
         try:
             url = self.URLs[0] + '/chat/api-token-auth/'
             payload = {'username': username, 'password': password}
             r = requests.post(url, data=payload)
-            print(r.status_code)
             if r.status_code == 200:
                 self.close()
                 data = r.json()
@@ -114,9 +110,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         open("cred.entials", "w").close()
 
     def open_main_window(self, token_id, user_id):
-        print('Opening main window')
         # open new window
-        print("SIEMA")
         self.ui = MainWindow(token_id, user_id, self.URLs)
 
     def validate_data(self, login, password):

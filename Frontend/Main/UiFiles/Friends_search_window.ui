@@ -6,30 +6,58 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>380</height>
+    <width>397</width>
+    <height>456</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Szukaj znajomych</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#MainWindow{
+background-color: rgb(248, 222, 214);
+}
+#centralwidget{
+background-color: rgb(248, 222, 214);
+}
+#button_search{
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(249, 198, 171, 255), stop:1 rgba(232, 109, 52, 255));
+border-radius: 13px;
+font: bold 11pt &quot;Routed Gothic&quot;;
+color: white
+}
+#button_search:hover {
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(224, 149, 127, 255), stop:1 rgba(228, 78, 9, 255));
+}
+#lineEdit_to_search{
+border-radius: 12px;
+font: &quot;Routed Gothic&quot;;
+background-color:white
+}
+#listWidget_users{
+border-radius: 15px;
+font: &quot;Routed Gothic&quot;;
+background-color:white
+}
+</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QListWidget" name="listWidget_users">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>60</y>
-      <width>300</width>
-      <height>310</height>
+      <width>361</width>
+      <height>381</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="button_search">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>280</x>
       <y>20</y>
-      <width>61</width>
+      <width>101</width>
       <height>31</height>
      </rect>
     </property>
@@ -40,9 +68,9 @@
    <widget class="QLineEdit" name="lineEdit_to_search">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>20</y>
-      <width>231</width>
+      <width>251</width>
       <height>31</height>
      </rect>
     </property>

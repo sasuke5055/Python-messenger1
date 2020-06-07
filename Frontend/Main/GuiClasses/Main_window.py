@@ -150,9 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_contact = contact
 
         conversation_id = self.conversation_ids[contact]
-        print(conversation_id)
         self.request_key(conversation_id)
-        print(self.key_manager.contains_conversation(conversation_id))
         if not self.key_manager.contains_conversation(conversation_id):  # send a request for the RSA key
             self.request_key(conversation_id)
             pop_alert("Poczekaj na wygenerowanie")
@@ -160,7 +158,6 @@ class MainWindow(QtWidgets.QMainWindow):
             # TODO we must wait for the key from conversation admin, leave this function/tell user about it
 
         if contact not in self.initialised_conversations:
-            print('CONTACT IS:', contact)
             self.get_messages(contact)
             contact_messages = messages[contact]
             self.initialised_conversations.append(contact)
@@ -211,7 +208,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def refresh_messages(self):
-        print('I NEED TO REFRESH!')
         self.show_messages()
 
     @QtCore.pyqtSlot()
@@ -227,8 +223,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def handle_key_request(self, data):  # current user is an admin, and we should send the key
         global flag
         # TODO notify user about it and let him decide
-        print('NEW KEY REQUEST!')
-        print()
         # request data
         conversation_id = data['conversation_id']
         dh_external_key = int(data['dh_key'])
@@ -254,8 +248,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def handle_key_response(self, data):
         global flag
-        print('NEW KEY RESPONSE!')
-        print()
         conversation_id = data['conversation_id']
         if not self.key_manager.contains_conversation(conversation_id):
             dh_key = int(data['dh_key'])
@@ -270,11 +262,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key)  # this is rsa.PrivateKey object
                 self.key_manager.add_key(conversation_id, decrypted_rsa_key)            
                 self.setup_contacts()
-            else:
-                print('INCORRECT DIFFIE HELLMAN ENCODING')
 
     def request_key(self, conversation_id):
-        print('IM REQUESTING A KEY')
         dh = self.key_manager.initialise_dh(conversation_id)
         dh_key = dh.gen_public_key()
         self.messenger.send_key_request(conversation_id, dh_key)
@@ -301,7 +290,6 @@ class MainWindow(QtWidgets.QMainWindow):
         for x in data:
             self.conversation_ids[x['title']] = x['id']
             e.append(x['title'])
-        print(self.conversation_ids)
 
         return e
 
@@ -311,8 +299,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         conversation_id = self.conversation_ids[contact]
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
-        if rsa_manager is None:
-            print("RSA NONE!"*100)
 
         url = self.URLs[0] + '/chat/messages/' + str(conversation_id)
         headers = {'Authorization': 'Token ' + self.token_id}
@@ -324,11 +310,8 @@ class MainWindow(QtWidgets.QMainWindow):
         for message in data:
             content = str(message['content'])
 
-            print('XDDD')
-            print(type(content))
             if rsa_manager != None:
                 content = rsa_manager.decrypt(content)
-            print(type(content))
 
             author_id = message['author']['id']
             if author_id == self.user_id:
@@ -346,18 +329,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def get_more_messages(self,e=1):
         """ get 'e' more messages from current conversation.   """
         contact = self.current_contact
-        
-        print("XDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+
         starting_pos = len(messages[contact]) or 0
         conversation_id = self.conversation_ids[contact]
         url = self.URLs[0]+'/chat/messages/'+str(conversation_id)
-        print(url)
         headers = {'Authorization': 'Token '+self.token_id}
         r = requests.get(url, headers=headers, data = {'start': starting_pos, 'end': 1})
         d = list()
         temp_messages = list()
         data = r.json()['content']
-        print(data)
         if contact not in messages:
             messages[contact] = []
         for message in data:
@@ -382,7 +362,6 @@ class MainWindow(QtWidgets.QMainWindow):
         
     def decode_message(self,message,conversation_id):
         content = message['content']
-        print(message)
 
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
         if rsa_manager != None:
@@ -429,7 +408,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # Todo: Przyszło zaproszenie
     def handle_friend_request(self, data):
-        print(data)
         request_id = int(data['request_id'])
         sender_name = data['sender']
         timestamp = data['timestamp']
@@ -443,7 +421,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def handle_responses(self, data):
-        print("XD"*100)
         admin_name = data['admin']
         title = data['title']
         pop_alert(f"{admin_name} Cię dodał do grupy {title}!")
@@ -467,7 +444,6 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def new_conversation_created(self, data):
         conversation_id = data['conversation_id']
-        print(f"ADMIN GENERUJE KLUCZ DO {conversation_id}")
         self.key_manager.start_generating_key(conversation_id)
         new_key = self.key_manager.generate_key()
         self.key_manager.add_key(conversation_id, new_key)

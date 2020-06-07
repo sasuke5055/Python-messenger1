@@ -54,7 +54,6 @@ class ChangePasswordWindow(QtWidgets.QMainWindow):
     def check_old_password(self):
         # Check if user inserted correct old password
         old_password = self.lineEdit_old_pass.text()
-        print(f"Zapytaj czy stare hasło: '{old_password}' sie zgadza")
         return True
 
     def check_password(self):

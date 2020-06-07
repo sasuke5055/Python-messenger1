@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         try:
-            headers = dict(self.scope['headers'])
+            headers = dict(self.scope['headers']) # data sent by user 
             if b'authorization' in headers:
                 token_name, token_key = headers[b'authorization'].decode().split()
                 if token_name == 'Token':
@@ -20,18 +20,15 @@ class ChatConsumer(WebsocketConsumer):
                     self.scope['user'] = token.user
                     self.user = token.user
 
-            print('GITARA', self.user)
         except Exception as e:
             print(e)
             self.user = self.scope['user']
-            print('PRZEGLADARKA', self.user)
 
         self.room_group_name = 'chat_%s' % self.user.pk
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
         )
-        print('cokolwiek')
         self.accept()
 
     def disconnect(self, close_code):
@@ -42,20 +39,15 @@ class ChatConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     def receive(self, text_data):
-        print("kurwa wchodze")
-        print(text_data)
         text_data_json = json.loads(text_data)
-        print(text_data_json)
-
         type = text_data_json['type']
         if type == 'message':
+            # server receives a message from user to his conversation
             content = text_data_json['content']
             conversation_id = text_data_json['conversation_id']
             conversation = Conversation.objects.get(pk=conversation_id)
-            print(self.user, conversation, content)
             message = create_message(self.user, conversation, content)
-            author = self.user.pk
-            for user in conversation.participants.all():
+            for user in conversation.participants.all(): # server sends message to all conversation participants
                 userConversation = UserConversation.objects.get(user=user, conversation=conversation)
                 if userConversation.is_listening:
                     room_group_name = 'chat_%s' % user.pk
@@ -67,7 +59,7 @@ class ChatConsumer(WebsocketConsumer):
                         room_group_name,
                         output_dict
                     )
-                else:
+                else: # currently not used, but has potential 
                     room_group_name = 'chat_%s' % user.pk
                     async_to_sync(self.channel_layer.group_send)(
                         room_group_name,
@@ -76,15 +68,14 @@ class ChatConsumer(WebsocketConsumer):
                             'conversation_id': conversation_id
                         }
                     )
-        elif type == 'join_conversation':
+        elif type == 'join_conversation': # currently not used, but has potential 
             conversation_id = text_data_json['conversation_id']
             conversation = Conversation.objects.get(pk=conversation_id)
             userConversation = UserConversation.objects.get(user=self.user, conversation=conversation)
             userConversation.is_listening = True
-            #TODO: add closing conversation
             userConversation.save()
+
         elif type == 'key_request':
-            print('GOT KEY REQUEST')
             conversation_id = text_data_json['conversation_id']
             dh_key = text_data_json['dh_key']
 
@@ -103,7 +94,6 @@ class ChatConsumer(WebsocketConsumer):
                         }
                     )
         elif type == 'key_response':
-            print('GOT KEY RESPONSE')
             # get message from conversation admin, and redirect it to its proper receiver
             conversation_id = text_data_json['conversation_id']
             user_id = text_data_json['user_id']
@@ -124,23 +114,16 @@ class ChatConsumer(WebsocketConsumer):
                 }
             )
         elif type == 'invite_friend':
-            print('wchodze do invitefr')
             friend_id = text_data_json['friend_id']
             friend_id = int(friend_id)
             receiver = User.objects.get(pk=friend_id)
-            print(receiver)
             notifications = receiver.notifications.get()
-            # if friend request was not already sent,2
-            print(receiver)
-            # todo: here changed
+            # if friend request was not already sent
             if not FriendRequest.objects.filter(user=notifications,
                                                 sender=self.user).exists():
                 request = create_friend_request(notifications, self.user)
-                # notifications = receiver.notifications.get()
             else:
                 request = FriendRequest.objects.get(user=notifications, sender=self.user)
-                print(receiver)
-            print('dupaduap')
             room_group_name = f'chat_{friend_id}'
             async_to_sync(self.channel_layer.group_send)(
                 room_group_name,
@@ -153,13 +136,14 @@ class ChatConsumer(WebsocketConsumer):
             )
 
         elif type == 'response_friend_req':
+            # creating conversation (or not, depends on whether user accepted friend request or not) and assinging its admin 
             request_id = text_data_json['id']
             response = text_data_json['response']
             f_request = FriendRequest.objects.get(id=request_id)
             if response == 'True':
                 conversation = accept_friend(self.user, f_request.sender, f_request)
                 if conversation is not None:
-                    self.notify_conversation_admin(conversation) #TA LINIJKA JEST WAŻNA / VERY IMPORTANT LINE 
+                    self.notify_conversation_admin(conversation) # VERY IMPORTANT LINE 
             elif response == "False":
                 reject_friend(f_request)
             room_group_name = f'chat_{f_request.sender.id}'
@@ -171,14 +155,15 @@ class ChatConsumer(WebsocketConsumer):
                     'response': response,
                 }
             )
-        elif type == 'create_group':
+        elif type == 'create_group': 
+            # creating group conversation 
             title = text_data_json['title']
             admin_id = int(text_data_json['admin_id'])
             users = text_data_json['users_ids']
             admin = User.objects.get(pk=admin_id)
             conv = create_new_conversation(title, admin, False)
             self.notify_conversation_admin(conv)
-            for user_id in users:
+            for user_id in users: # adding ppl to created conversation
                 user = User.objects.get(pk=int(user_id))
                 add_user_to_conversation(user, conv)
 
@@ -194,7 +179,7 @@ class ChatConsumer(WebsocketConsumer):
             
 
 
-    # Receive message from room group
+    # Receive message from room conversation
     def chat_message(self, event):
         message = event['message']
         async_to_sync(self.send(text_data=json.dumps({
@@ -293,46 +278,3 @@ class ChatConsumer(WebsocketConsumer):
         })))
 
 
-
-# class ChatConsumer(AsyncWebsocketConsumer):
-#     async def connect(self):
-#         self.room_name = self.scope['url_route']['kwargs']['room_name']
-#         self.room_group_name = 'chat_%s' % self.room_name
-
-#         # Join room group
-#         await self.channel_layer.group_add(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#         await self.accept()
-
-#     async def disconnect(self, close_code):
-#         # Leave room group
-#         await self.channel_layer.group_discard(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#     # Receive message from WebSocket
-#     async def receive(self, text_data):
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json['message']
-
-#         # Send message to room group
-#         await self.channel_layer.group_send(
-#             self.room_group_name,
-#             {
-#                 'type': 'chat_message',
-#                 'message': message
-#             }
-#         )
-
-#     # Receive message from room group
-#     async def chat_message(self, event):
-#         message = event['message']
-
-#         # Send message to WebSocket
-#         await self.send(text_data=json.dumps({
-#             'message': message
-#         }))

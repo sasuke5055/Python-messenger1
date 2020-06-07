@@ -47,9 +47,7 @@ class Messenger(QtCore.QObject):
         self.callback_new_group_created.append(f)
 
     def on_message(self, data):
-        print("cokolwiek")
         data = json.loads(data)
-        print(data)
         if(data['type'] == 'new_message'):
             for f in self.callback_new_message_reveiced:
                 f(data)
@@ -75,7 +73,6 @@ class Messenger(QtCore.QObject):
                 f(data)
         
         elif data['type'] == 'create_group_notify':
-            print("TUTAJ"*100)
             for f in self.callback_new_group_created:
                 f(data)
 
@@ -134,9 +131,7 @@ class Messenger(QtCore.QObject):
             'type': 'invite_friend',
             'friend_id': id
         }
-        print("messaging send_fr_req")
-        print(id)
-        print(data)
+
         self.sub_socket.send(json.dumps(data))
 
     def send_f_req_response(self, request_id, response):
@@ -145,8 +140,7 @@ class Messenger(QtCore.QObject):
             'id': request_id,
             'response': response,
         }
-        print(data)
-        print(json.dumps(data))
+
         self.sub_socket.send(json.dumps(data))
 
 
@@ -157,5 +151,4 @@ class Messenger(QtCore.QObject):
             'admin_id' : admin,
             'users_ids' : users, 
         }
-        print(data)
         self.sub_socket.send(json.dumps(data))
