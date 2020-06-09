@@ -4,9 +4,11 @@ from PyQt5.QtWidgets import QMessageBox, QDialogButtonBox, QSizePolicy
 from random import randint
 import time
 
+
 class FriendsInvitationsWindows(QtWidgets.QMainWindow):
     def __init__(self, MainWindow, URLs):
         super(FriendsInvitationsWindows, self).__init__()
+        self.users = []
         uic.loadUi('UiFiles/Friends_invitations_window.ui', self)
         self.MainWindow = MainWindow
         self.URLs = URLs
@@ -19,7 +21,6 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.listWidget_invitations = self.findChild(QtWidgets.QListWidget, 'listWidget_invitations')
-
 
     def closeEvent(self, event):
         # Unlock login window when closing this window
@@ -63,7 +64,6 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
 
     def get_invitations(self):
         self.listWidget_invitations.clear()
-        self.users = []
         url = self.URLs[0] + '/chat/notifications/'
         headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
         r = requests.get(url, headers=headers)
@@ -103,7 +103,7 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
             self.remove_invitation(index)
 
     def add_friend(self, index):
-        
+
         id = self.invitations_list[index]['id']
         self.MainWindow.send_friend_req_response(id, 'True')
         self.get_invitations()
@@ -115,5 +115,3 @@ class FriendsInvitationsWindows(QtWidgets.QMainWindow):
         self.MainWindow.send_friend_req_response(id, 'False')
         self.get_invitations()
         self.close()
-
-

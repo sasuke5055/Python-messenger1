@@ -25,7 +25,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         self.lineEdit_username = self.findChild(QtWidgets.QLineEdit, 'lineEdit_username')
         self.lineEdit_password = self.findChild(QtWidgets.QLineEdit, 'lineEdit_password')
         self.checkBox_remember = self.findChild(QtWidgets.QCheckBox, 'checkBox_remember')
-        self.opened_main_window = False 
+        self.opened_main_window = False
         self.button_login.pressed.connect(self.login_button_pressed)
         self.button_forgot.pressed.connect(self.forgot_button_pressed)
         self.button_register.pressed.connect(self.register_button_pressed)
@@ -46,7 +46,6 @@ class LoginWindow(QtWidgets.QMainWindow):
             self.save_users_credentials(username, password)
         else:
             self.delete_users_credentials()
-
 
         # try for present server
         try:
@@ -111,7 +110,7 @@ class LoginWindow(QtWidgets.QMainWindow):
 
     def open_main_window(self, token_id, user_id):
         # open new window
-        self.ui = MainWindow(token_id, user_id, self.URLs)
+        self.ui = MainWindow(token_id, user_id, self.URLs, self)
 
     def validate_data(self, login, password):
         # Checks if login/password is not empty

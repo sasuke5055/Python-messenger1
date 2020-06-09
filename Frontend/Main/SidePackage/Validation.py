@@ -1,4 +1,4 @@
-minimum_pass_len = 4
+minimum_pass_len = 8
 
 
 def validate_email(text):

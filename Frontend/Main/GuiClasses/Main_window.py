@@ -15,7 +15,8 @@ from .Managers.KeyManager import KeyManager
 # TODO kluczami messages powinny być id konwersacji
 messages = {}
 username = "Ty"
-flag = 17843 
+flag = 17843
+
 
 def split_message(message, count=26):
     """split words to have at maximum 'count' characters """
@@ -33,13 +34,14 @@ def split_message(message, count=26):
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, token_id, user_id, URLs):
+    def __init__(self, token_id, user_id, URLs, login_window):
         super(MainWindow, self).__init__()
         self.token_id = token_id
         self.user_id = user_id
         self.URLs = URLs
         self.conversation_ids = dict()
-        #TODO: WYWALIĆ INITIALISED
+
+        self.login_window = login_window
         self.initialised_conversations = []
 
         self.connect_to_socket()
@@ -52,9 +54,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setup_contacts()
         self.show()
-
-    
-
 
     def connect_to_socket(self):
         address = self.URLs[1] + "/ws/chat/xd/"
@@ -70,25 +69,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messenger.add_callback_friend_req_response(self.friend_req_repsponse)
         self.messenger.add_callback_conversation_created(self.new_conversation_created)
         self.messenger.add_callback_new_group_created(self.handle_responses)
-        
+
     def initUi(self):
         self.button_send_message = self.findChild(QtWidgets.QPushButton, 'button_send_message')
         self.button_send_message.clicked.connect(self.send_new_message)
-        self.button_send_message.setStyleSheet(
-            "QPushButton {"
-            "  font-size: 11px;\n"
-            "  text-align: center;\n"
-            "  text-decoration: none;\n"
-            "  outline: none;\n"
-            "  color: black;\n"
-            "  background-color: #008ae6;\n"
-            "  border: none;\n"
-            "  border-radius: 15px;\n"
-            "  }\n"
-            "QPushButton:hover { \n"
-            "background-color: #1aa3ff\n"
-            "}"
-        )
+
         self.text_new_message = self.findChild(QtWidgets.QTextEdit, 'text_new_message')
         self.centralwidget = self.findChild(QtWidgets.QWidget, 'centralwidget')
         self.list_contacts = self.findChild(QtWidgets.QListWidget, 'list_contacts')
@@ -96,6 +81,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_messages = self.findChild(QtWidgets.QListWidget, 'list_messages')
         self.list_messages.setWordWrap(True)
         self.list_messages.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+
+        # logout button
+        self.button_logout = self.findChild(QtWidgets.QPushButton, 'button_Logout')
+        self.button_logout.clicked.connect(self.logout)
 
         # Menu setup
         # Profile menu
@@ -106,11 +95,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.action_friens_list = self.findChild(QtWidgets.QAction, 'action_friens_list')
         self.action_find_friends = self.findChild(QtWidgets.QAction, 'action_find_friends')
         self.action_invitations_list = self.findChild(QtWidgets.QAction, 'action_invitations_list')
-        self.action_new_conversation = self.findChild(QtWidgets.QAction, 'action_nowa_konwersacja')
+        self.action_new_conversation = self.findChild(QtWidgets.QAction, 'action_new_conversation')
         self.action_friens_list.triggered.connect(self.open_friends_list_window)
         self.action_find_friends.triggered.connect(self.open_friends_search_window)
         self.action_invitations_list.triggered.connect(self.open_fiends_invitations_windows)
         self.action_new_conversation.triggered.connect(self.open_groups_windows)
+
     def setup_contacts(self):
         " show all contacs and groups of yours "
         self.list_contacts.clear()
@@ -127,22 +117,22 @@ class MainWindow(QtWidgets.QMainWindow):
         """make sending message possible"""
         self.list_messages.clear()
         self.button_send_message.setEnabled(True)
-        button_load_messages = QtWidgets.QPushButton("next")
+        button_load_messages = QtWidgets.QPushButton("więcej wiadomości")
         item_widget = QtWidgets.QListWidgetItem()
         widget = QtWidgets.QWidget()
-        widget_layout =  QtWidgets.QVBoxLayout()
+        widget_layout = QtWidgets.QVBoxLayout()
         widget_layout.addWidget(button_load_messages)
         widget_layout.addStretch()
         widget_layout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         widget.setLayout(widget_layout)
         item_widget.setSizeHint(widget.sizeHint())
         self.list_messages.addItem(item_widget)
-        self.list_messages.setItemWidget(item_widget,widget)
+        self.list_messages.setItemWidget(item_widget, widget)
 
         """show messages between you and given contact named 'item'"""
         contact = item.text() if item is not None else self.current_contact
         if item is not None:
-            messages.pop(self.current_contact,None)
+            messages.pop(self.current_contact, None)
             if self.current_contact in self.initialised_conversations:
                 self.initialised_conversations.remove(self.current_contact)
         button_load_messages.clicked.connect(self.get_more_messages)
@@ -243,7 +233,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setup_contacts()
 
         encrypted_rsa_key = dh_local.encrypt_key(rsa_key['rsa_key'])  # this is a dictionary    
-        encrypted_flag    = dh_local.encrypt_message(flag)
+        encrypted_flag = dh_local.encrypt_message(flag)
         self.messenger.send_key_response(conversation_id, user_id, dh_local_key, encrypted_rsa_key, encrypted_flag)
 
     def handle_key_response(self, data):
@@ -260,7 +250,7 @@ class MainWindow(QtWidgets.QMainWindow):
             decrypted_flag = dh.decrypt_message(encrypted_flag)
             if flag == decrypted_flag:
                 decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key)  # this is rsa.PrivateKey object
-                self.key_manager.add_key(conversation_id, decrypted_rsa_key)            
+                self.key_manager.add_key(conversation_id, decrypted_rsa_key)
                 self.setup_contacts()
 
     def request_key(self, conversation_id):
@@ -293,16 +283,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         return e
 
-    def get_messages(self, contact,start=0,end=2):
-        if start == 0 and end == 2: 
-            messages.pop(contact,None)
+    def get_messages(self, contact, start=0, end=2):
+        if start == 0 and end == 2:
+            messages.pop(contact, None)
 
         conversation_id = self.conversation_ids[contact]
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
 
         url = self.URLs[0] + '/chat/messages/' + str(conversation_id)
         headers = {'Authorization': 'Token ' + self.token_id}
-        r = requests.get(url, headers=headers, data={'start':start, 'end':end})
+        r = requests.get(url, headers=headers, data={'start': start, 'end': end})
         d = list()
         data = r.json()['content']
         if contact not in messages:
@@ -326,30 +316,30 @@ class MainWindow(QtWidgets.QMainWindow):
         messages[contact].reverse()
         return messages[contact]
 
-    def get_more_messages(self,e=1):
+    def get_more_messages(self, e=1):
         """ get 'e' more messages from current conversation.   """
         contact = self.current_contact
 
         starting_pos = len(messages[contact]) or 0
         conversation_id = self.conversation_ids[contact]
-        url = self.URLs[0]+'/chat/messages/'+str(conversation_id)
-        headers = {'Authorization': 'Token '+self.token_id}
-        r = requests.get(url, headers=headers, data = {'start': starting_pos, 'end': 1})
+        url = self.URLs[0] + '/chat/messages/' + str(conversation_id)
+        headers = {'Authorization': 'Token ' + self.token_id}
+        r = requests.get(url, headers=headers, data={'start': starting_pos, 'end': 1})
         d = list()
         temp_messages = list()
         data = r.json()['content']
         if contact not in messages:
             messages[contact] = []
         for message in data:
-            content = self.decode_message(message,conversation_id)
+            content = self.decode_message(message, conversation_id)
             author_id = message['author']['id']
             if author_id == self.user_id:
                 message_prefix = "Ty: "
             else:
                 author_name = message['author']['username']
                 message_prefix = author_name + ": "
-                
-            temp_messages.append(message_prefix + content) 
+
+            temp_messages.append(message_prefix + content)
             d.append((author_id, content))
         """return e more messages between you and given contact"""
         temp_messages.reverse()
@@ -359,8 +349,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show_messages()
         """ we then refresh the chat and scroll messages to top """
         self.list_messages.scrollToTop()
-        
-    def decode_message(self,message,conversation_id):
+
+    def decode_message(self, message, conversation_id):
         content = message['content']
 
         rsa_manager = self.key_manager.get_rsa_manager(conversation_id)
@@ -371,7 +361,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def append_new_message(self, message):
         author_id = int(message['author']['id'])
         conversation_id = int(message['conversation_id'])
-        content = self.decode_message(message,conversation_id)
+        content = self.decode_message(message, conversation_id)
 
         contact = next((title for title, id in self.conversation_ids.items() if id == conversation_id), None)
         if contact not in self.initialised_conversations:
@@ -402,9 +392,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setDisabled(True)
 
     def open_groups_windows(self):
-        self.ui = GroupsWindow(self,self.URLs)
+        self.ui = GroupsWindow(self, self.URLs)
         self.setDisabled(True)
-        
 
     # Todo: Przyszło zaproszenie
     def handle_friend_request(self, data):
@@ -419,13 +408,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def send_friend_request(self, id):
         self.messenger.send_friend_request(id)
 
-
     def handle_responses(self, data):
         admin_name = data['admin']
         title = data['title']
         pop_alert(f"{admin_name} Cię dodał do grupy {title}!")
         self.setup_contacts()
-        
 
     def friend_req_repsponse(self, data):
         friend_name = data['sender']
@@ -436,12 +423,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         else:
             pop_alert(f"{friend_name} Cię odrzucił")
-        
 
     def send_friend_req_response(self, req_id, response):
         self.messenger.send_f_req_response(req_id, response)
 
-    
     def new_conversation_created(self, data):
         conversation_id = data['conversation_id']
         self.key_manager.start_generating_key(conversation_id)
@@ -449,3 +434,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.key_manager.add_key(conversation_id, new_key)
 
         self.setup_contacts()
+
+    def logout(self):
+        self.close()
+        self.messenger.sub_socket.close()
+        self.login_window.__init__(self.URLs)

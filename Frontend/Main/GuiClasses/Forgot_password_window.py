@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, uic
 from SidePackage.Validation import validate_email
 from SidePackage.Error import pop_alert
 
+
 class ForgotWindow(QtWidgets.QMainWindow):
     def __init__(self, LoginWindow):
         super(ForgotWindow, self).__init__()
