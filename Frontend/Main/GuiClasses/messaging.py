@@ -12,6 +12,7 @@ class Messenger(QtCore.QObject):
     key_received_signal = QtCore.pyqtSignal()
     request_received_singal = QtCore.pyqtSignal()
     f_request_response_signal = QtCore.pyqtSignal()
+    refresh_conversations = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -66,14 +67,18 @@ class Messenger(QtCore.QObject):
         elif data['type'] == 'response_f_request':
             for f in self.callback_friend_req_response:
                 f(data)
+            self.refresh_conversations.emit()
 
         elif data['type'] == 'new_conversation':
             for f in self.callback_conversation_created:
                 f(data)
+            self.refresh_conversations.emit()
 
         elif data['type'] == 'create_group_notify':
             for f in self.callback_new_group_created:
                 f(data)
+            self.refresh_conversations.emit()
+
 
     def on_error(self, *args):
         print('Errors:')
