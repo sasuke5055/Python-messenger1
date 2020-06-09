@@ -11,6 +11,7 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
         self.MainWindow = MainWindow
         self.URLs = URLs
         self.users = []
+        self.friends_list = []
 
         self.initUI()
         self.show()
@@ -39,8 +40,18 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
         headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
         r = requests.get(url, headers=headers, data={'key': string})
         respond = r.json()['content']
-
         self.users = respond
+
+        # Get your frieds list
+        self.friends_list = []
+        url = self.URLs[0] + '/chat/contacts/'
+        headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
+        r = requests.get(url, headers=headers)
+        respond1 = r.json()['content']
+        self.friends_list = respond1['friends']
+
+        self.users = [x for x in self.users if x['id'] not in list(map(lambda x: x['id'], self.friends_list))]
+
         for f in self.users:
             self.add_element(f['username'])
 
@@ -56,7 +67,6 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Abort)
         respond = msg.exec_()
         msg.show()
-
         if respond == 16384:
             self.add_friend(item)
 
@@ -64,3 +74,4 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
         row = self.listWidget_users.row(self.listWidget_users.currentItem())
         id = self.users[row]['id']
         self.MainWindow.send_friend_request(id)
+

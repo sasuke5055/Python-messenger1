@@ -60,6 +60,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messenger = Messenger()
         self.messenger.subscribe_to_socket(address, self.token_id)
         self.messenger.message_signal.connect(self.refresh_messages)
+        self.messenger.refresh_conversations.connect(self.setup_contacts)
         self.messenger.key_received_signal.connect(self.on_key_receive)
         self.messenger.message_signal.connect(self.f_req_response)
         self.messenger.add_callback_new_message_received(self.append_new_message)
@@ -73,6 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def initUi(self):
         self.button_send_message = self.findChild(QtWidgets.QPushButton, 'button_send_message')
         self.button_send_message.clicked.connect(self.send_new_message)
+        self.button_send_message.setEnabled(False)
 
         self.text_new_message = self.findChild(QtWidgets.QTextEdit, 'text_new_message')
         self.centralwidget = self.findChild(QtWidgets.QWidget, 'centralwidget')
@@ -101,6 +103,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.action_invitations_list.triggered.connect(self.open_fiends_invitations_windows)
         self.action_new_conversation.triggered.connect(self.open_groups_windows)
 
+    @QtCore.pyqtSlot()
     def setup_contacts(self):
         " show all contacs and groups of yours "
         self.list_contacts.clear()
@@ -230,7 +233,7 @@ class MainWindow(QtWidgets.QMainWindow):
             new_key = self.key_manager.generate_key()
             self.key_manager.add_key(conversation_id, new_key)
             rsa_key = self.key_manager.get_key(conversation_id)
-            self.setup_contacts()
+            # self.setup_contacts()
 
         encrypted_rsa_key = dh_local.encrypt_key(rsa_key['rsa_key'])  # this is a dictionary    
         encrypted_flag = dh_local.encrypt_message(flag)
@@ -251,7 +254,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if flag == decrypted_flag:
                 decrypted_rsa_key = dh.decrypt_key(encrypted_rsa_key)  # this is rsa.PrivateKey object
                 self.key_manager.add_key(conversation_id, decrypted_rsa_key)
-                self.setup_contacts()
+                # self.setup_contacts()
 
     def request_key(self, conversation_id):
         dh = self.key_manager.initialise_dh(conversation_id)
@@ -412,13 +415,13 @@ class MainWindow(QtWidgets.QMainWindow):
         admin_name = data['admin']
         title = data['title']
         pop_alert(f"{admin_name} Cię dodał do grupy {title}!")
-        self.setup_contacts()
+        # self.setup_contacts()
 
     def friend_req_repsponse(self, data):
         friend_name = data['sender']
         if data['response'] == 'True':
             pop_alert(f"{friend_name} Cię dodał do znajomych!")
-            self.setup_contacts()
+          #  self.setup_contacts()
 
 
         else:
@@ -433,7 +436,7 @@ class MainWindow(QtWidgets.QMainWindow):
         new_key = self.key_manager.generate_key()
         self.key_manager.add_key(conversation_id, new_key)
 
-        self.setup_contacts()
+     #   self.setup_contacts()
 
     def logout(self):
         self.close()
