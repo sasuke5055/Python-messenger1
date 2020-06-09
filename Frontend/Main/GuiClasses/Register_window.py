@@ -6,28 +6,29 @@ import urllib.request
 import urllib.parse
 import requests
 
+
 class RegisterWindow(QtWidgets.QMainWindow):
     def __init__(self, LoginWindow):
         super(RegisterWindow, self).__init__()
         uic.loadUi('UiFiles/Register_window.ui', self)
         self.LoginWindow = LoginWindow
-        self.minimum_pass_len = 4
+        self.minimum_pass_len = 8
 
         self.initUi()
 
         self.show()
 
     def initUi(self):
-         self.button_register = self.findChild(QtWidgets.QPushButton, 'button_register')
-         self.lineEdit_login = self.findChild(QtWidgets.QLineEdit, 'lineEdit_login')
-         self.lineEdit_pass = self.findChild(QtWidgets.QLineEdit, 'lineEdit_pass')
-         self.lineEdit_pass2 = self.findChild(QtWidgets.QLineEdit, 'lineEdit_pass2')
-         self.lineEdit_fname = self.findChild(QtWidgets.QLineEdit, 'lineEdit_fname')
-         self.lineEdit_sname = self.findChild(QtWidgets.QLineEdit, 'lineEdit_sname')
-         self.lineEdit_email = self.findChild(QtWidgets.QLineEdit, 'lineEdit_email')
-         self.lineEdit_email2 = self.findChild(QtWidgets.QLineEdit, 'lineEdit_email2')
+        self.button_register = self.findChild(QtWidgets.QPushButton, 'button_register')
+        self.lineEdit_login = self.findChild(QtWidgets.QLineEdit, 'lineEdit_login')
+        self.lineEdit_pass = self.findChild(QtWidgets.QLineEdit, 'lineEdit_pass')
+        self.lineEdit_pass2 = self.findChild(QtWidgets.QLineEdit, 'lineEdit_pass2')
+        self.lineEdit_fname = self.findChild(QtWidgets.QLineEdit, 'lineEdit_fname')
+        self.lineEdit_sname = self.findChild(QtWidgets.QLineEdit, 'lineEdit_sname')
+        self.lineEdit_email = self.findChild(QtWidgets.QLineEdit, 'lineEdit_email')
+        self.lineEdit_email2 = self.findChild(QtWidgets.QLineEdit, 'lineEdit_email2')
 
-         self.button_register.pressed.connect(self.register_button_pressed)
+        self.button_register.pressed.connect(self.register_button_pressed)
 
     def closeEvent(self, event):
         # Unlock login window when closing this window
@@ -57,6 +58,11 @@ class RegisterWindow(QtWidgets.QMainWindow):
             pop_alert("Podane adresy email się różnią")
             return
 
+        if not self.check_username_availability(self.lineEdit_login.text()):
+            self.lineEdit_login.setText("")
+            pop_alert("Ten login jest już zajęty!")
+            return
+
         # Validate data
         if not validate_password(self.lineEdit_pass.text()):
             self.lineEdit_pass.setText("")
@@ -68,10 +74,13 @@ class RegisterWindow(QtWidgets.QMainWindow):
             self.lineEdit_email2.setText("")
             pop_alert("Podaj poprawne adres email")
             return
-        
-        self.send_request_to_server()
-        # Todo: Czekaj na odpowiedź od serwera i wyrzuć powodzenie lub niepowodzenie
-        self.close()
+
+        passed = self.send_request_to_server()
+        if passed:
+            self.close()
+        else:
+            self.lineEdit_pass.setText("")
+            self.lineEdit_pass2.setText("")
 
     def check_email(self):
         # Check if 2 emails are the same
@@ -87,6 +96,11 @@ class RegisterWindow(QtWidgets.QMainWindow):
         # Another conditions
         return True
 
+    def check_username_availability(self, username):
+        url = self.LoginWindow.URLs[0] + '/chat/username_available/'
+        r = requests.post(url, data={'username': username})
+        return r.json()['content']
+
     def send_request_to_server(self):
         # try for server present
         try:
@@ -98,5 +112,12 @@ class RegisterWindow(QtWidgets.QMainWindow):
             url = self.LoginWindow.URLs[0] + '/chat/rest-auth/registration/'
             payload = {'username': login, 'password1': password, 'password2': password}
             r = requests.post(url, data=payload)
+            if r.status_code == 400:
+                pop_alert("Błąd rejstracji, spróbuj ponownie z innym hasłem lub loginem")
+                return False
+            elif r.status_code != 201:
+                pop_alert("Błąd rejstracji, spróbuj ponownie")
+                return False
+            return True
         except:
             pop_alert("Błąd sieci, sprawdź połączenie.")

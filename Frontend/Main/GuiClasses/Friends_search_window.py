@@ -34,7 +34,6 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
     def search_friends(self):
         self.users = []
         self.listWidget_users.clear()
-        # Todo: Check if string is not empty
         string = self.lineEdit_to_search.text()
         url = self.URLs[0] + '/chat/search/'
         headers = {'Authorization': 'Token ' + self.MainWindow.token_id}
@@ -65,5 +64,3 @@ class FriendsSearchWindow(QtWidgets.QMainWindow):
         row = self.listWidget_users.row(self.listWidget_users.currentItem())
         id = self.users[row]['id']
         self.MainWindow.send_friend_request(id)
-
-

@@ -285,7 +285,7 @@ color:white
      <string> Powtórz email:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_login">
+   <widget class="QLineEdit" name="lineEdit_fname">
     <property name="geometry">
      <rect>
       <x>600</x>
@@ -321,7 +321,7 @@ color:white
      <enum>QLineEdit::Password</enum>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_fname">
+   <widget class="QLineEdit" name="lineEdit_login">
     <property name="geometry">
      <rect>
       <x>210</x>
@@ -385,6 +385,16 @@ color:white
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_login</tabstop>
+  <tabstop>lineEdit_pass</tabstop>
+  <tabstop>lineEdit_pass2</tabstop>
+  <tabstop>lineEdit_fname</tabstop>
+  <tabstop>lineEdit_sname</tabstop>
+  <tabstop>lineEdit_email</tabstop>
+  <tabstop>lineEdit_email2</tabstop>
+  <tabstop>button_register</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

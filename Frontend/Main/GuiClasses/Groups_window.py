@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from PyQt5.QtWidgets import QMessageBox, QDialogButtonBox, QSizePolicy
 from random import randint
 
+
 class GroupsWindow(QtWidgets.QMainWindow):
     def __init__(self, MainWindow, URLs):
         super(GroupsWindow, self).__init__()
@@ -19,11 +20,12 @@ class GroupsWindow(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.listView_friends = self.findChild(QtWidgets.QListView, 'listView_friends')
-        self.lineEdit_name    = self.findChild(QtWidgets.QLineEdit, 'lineEdit_name')
-        self.buttonBox        = self.findChild(QtWidgets.QDialogButtonBox, 'buttonBox')
+        self.lineEdit_name = self.findChild(QtWidgets.QLineEdit, 'lineEdit_name')
+        self.buttonBox = self.findChild(QtWidgets.QDialogButtonBox, 'buttonBox')
         self.model = QtGui.QStandardItemModel(self.listView_friends)
         self.buttonBox.accepted.connect(self.get_checked_friends)
         self.buttonBox.rejected.connect(self.close)
+
     def closeEvent(self, event):
         # Unlock login window when closing this window
         self.MainWindow.setDisabled(False)
@@ -32,7 +34,6 @@ class GroupsWindow(QtWidgets.QMainWindow):
         item = QtGui.QStandardItem(text)
         item.setCheckable(True)
         self.model.appendRow(item)
-
 
     def get_checked_friends(self):
         conversation_name = self.lineEdit_name.text()
@@ -55,4 +56,3 @@ class GroupsWindow(QtWidgets.QMainWindow):
         for f in self.friends_list:
             usr = f['username']
             self.add_element(f['username'])
-

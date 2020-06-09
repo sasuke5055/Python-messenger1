@@ -114,26 +114,31 @@ class ChatConsumer(WebsocketConsumer):
                 }
             )
         elif type == 'invite_friend':
-            friend_id = text_data_json['friend_id']
-            friend_id = int(friend_id)
-            receiver = User.objects.get(pk=friend_id)
-            notifications = receiver.notifications.get()
-            # if friend request was not already sent
-            if not FriendRequest.objects.filter(user=notifications,
-                                                sender=self.user).exists():
-                request = create_friend_request(notifications, self.user)
-            else:
-                request = FriendRequest.objects.get(user=notifications, sender=self.user)
-            room_group_name = f'chat_{friend_id}'
-            async_to_sync(self.channel_layer.group_send)(
-                room_group_name,
-                {
-                    'type': 'invite',
-                    'sender_name': self.user.username,
-                    'request_id': request.id,
-                    'timestamp': str(request.timestamp)
-                }
-            )
+            friend_id = int(text_data_json['friend_id'])
+
+            try:
+                # return if users are friends already
+                self.user.contact.get().friends.get(pk=friend_id)
+                return
+            except:
+                receiver = User.objects.get(pk=friend_id)
+                notifications = receiver.notifications.get()
+                # if friend request was not already sent
+                if not FriendRequest.objects.filter(user=notifications,
+                                                    sender=self.user).exists():
+                    request = create_friend_request(notifications, self.user)
+                else:
+                    request = FriendRequest.objects.get(user=notifications, sender=self.user)
+                room_group_name = f'chat_{friend_id}'
+                async_to_sync(self.channel_layer.group_send)(
+                    room_group_name,
+                    {
+                        'type': 'invite',
+                        'sender_name': self.user.username,
+                        'request_id': request.id,
+                        'timestamp': str(request.timestamp)
+                    }
+                )
 
         elif type == 'response_friend_req':
             # creating conversation (or not, depends on whether user accepted friend request or not) and assinging its admin 

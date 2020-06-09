@@ -1,9 +1,11 @@
 from django.contrib import admin
 from .models import *
- 
+
+
 class UserConversationAdmin(admin.ModelAdmin):
     readonly_fields = ('last_read_timestamp',)
- 
+
+
 # Register your models here.
 admin.site.register(Contact)
 admin.site.register(Message)

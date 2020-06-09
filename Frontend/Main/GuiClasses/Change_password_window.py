@@ -10,7 +10,7 @@ class ChangePasswordWindow(QtWidgets.QMainWindow):
         super(ChangePasswordWindow, self).__init__()
         uic.loadUi('UiFiles/Change_password_window.ui', self)
         self.MainWindow = MainWindow
-        self.minimum_pass_len = 4
+        self.minimum_pass_len = 10
         self.URLs = URLs
 
         self.initUI()
@@ -65,7 +65,6 @@ class ChangePasswordWindow(QtWidgets.QMainWindow):
         return True
 
     def send_request(self):
-        # Todo: Send request to server
         new_password = self.lineEdit_new_pass2.text()
 
         url = self.URLs[0] + '/chat/password/change/'

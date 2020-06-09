@@ -4,6 +4,8 @@ from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
 
 User = get_user_model()
+
+
 # executes when new user signed up
 @receiver(user_signed_up)
 def after_user_signed_up(request, user, **kwargs):
@@ -30,12 +32,11 @@ class Conversation(models.Model):
     title = models.CharField(max_length=1000)
     admin = models.ForeignKey(User, default=None, null=True, on_delete=models.CASCADE)
 
-
     def __str__(self):
         return "{}: {}".format(self.pk, self.title)
 
     def get_last_messages(self, start, count):
-        return self.messages.order_by('-timestamp').all()[start:start+count]
+        return self.messages.order_by('-timestamp').all()[start:start + count]
 
     def get_last_messages_timestamp(self, timestamp):
         return self.messages.order_by('-timestamp').filter(timestamp__gt=timestamp)
@@ -49,9 +50,9 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-
     def __str__(self):
         return "author:{}, conversation: {}, id: {}".format(self.author.username, self.conversation, self.pk)
+
 
 class UserConversation(models.Model):
     readonly_fields = ('last_read_timestamp',)
@@ -117,5 +118,3 @@ class FriendRequest(models.Model):
 
     def __str__(self):
         return f"type: {self.notify_type}, from: {self.sender}, to: {self.user.user}"
-
-

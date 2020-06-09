@@ -119,10 +119,10 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
      </rect>
     </property>
     <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;XDDDDDDDDDDDDDDDDDD&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="whatsThis">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;HALOOOOO&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -174,7 +174,23 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
     <addaction name="action_change_pass"/>
     <addaction name="action_change_infos"/>
    </widget>
+   <widget class="QMenu" name="menuZnajomi">
+    <property name="title">
+     <string>Znajomi</string>
+    </property>
+    <addaction name="action_friens_list"/>
+    <addaction name="action_find_friends"/>
+    <addaction name="action_invitations_list"/>
+   </widget>
+   <widget class="QMenu" name="menuUtw_rz_konwersacje">
+    <property name="title">
+     <string>Konwersacje</string>
+    </property>
+    <addaction name="action_new_conversation"/>
+   </widget>
    <addaction name="menu_profile"/>
+   <addaction name="menuZnajomi"/>
+   <addaction name="menuUtw_rz_konwersacje"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_change_pass">
@@ -185,6 +201,26 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
   <action name="action_change_infos">
    <property name="text">
     <string>Zmiana danych</string>
+   </property>
+  </action>
+  <action name="action_friens_list">
+   <property name="text">
+    <string>Moi znajomi</string>
+   </property>
+  </action>
+  <action name="action_find_friends">
+   <property name="text">
+    <string>Szukaj</string>
+   </property>
+  </action>
+  <action name="action_invitations_list">
+   <property name="text">
+    <string>Zaproszenia do znajomych</string>
+   </property>
+  </action>
+  <action name="action_new_conversation">
+   <property name="text">
+    <string>Nowa konwersacja</string>
    </property>
   </action>
  </widget>

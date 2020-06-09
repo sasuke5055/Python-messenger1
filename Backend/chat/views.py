@@ -1,21 +1,25 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import User, Contact, Conversation, UserConversation
 import json
 from django.core import serializers
-from .serializers import ContactSerializer, UserSerializer, UserConversationSerializer, MessageSerializer, FriendRequestsSerializer
+from .serializers import ContactSerializer, UserSerializer, UserConversationSerializer, MessageSerializer, \
+    FriendRequestsSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+
 
 def index(request):
     return render(request, 'chat/index.html')
 
+
 def room(request):
     return render(request, 'chat/room.html', {
-        
+
     })
+
 
 class ContactsView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -41,7 +45,7 @@ class ConversationsView(APIView):
     def get(self, request):
         conversations_data = []
         for conversation in request.user.conversations.all():
-             conversations_data.append(UserConversation.objects.get(user=request.user, conversation=conversation))
+            conversations_data.append(UserConversation.objects.get(user=request.user, conversation=conversation))
         content = {'content': UserConversationSerializer(conversations_data, many=True).data}
         return Response(content)
 
@@ -53,8 +57,9 @@ class ConversationMessagesView(APIView):
         start = int(request.data['start'])
         end = int(request.data['end'])
         conversation = Conversation.objects.get(id=pk)
-        content = {'content':MessageSerializer(conversation.get_last_messages(start,end), many=True).data}
+        content = {'content': MessageSerializer(conversation.get_last_messages(start, end), many=True).data}
         return Response(content)
+
 
 class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
@@ -79,13 +84,14 @@ class SearchView(APIView):
         content = {'content': matching_friends + strangers}
         return Response(content)
 
+
 class NotificationsView(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     # return all user friend requests
     def get(self, request):
         notifications = request.user.notifications.get()
-        content = {'content':  FriendRequestsSerializer(notifications.get_all_notifications(), many=True).data}
+        content = {'content': FriendRequestsSerializer(notifications.get_all_notifications(), many=True).data}
         return Response(content)
 
 
@@ -97,3 +103,14 @@ class PasswordChangeView(APIView):
         request.user.set_password(new_password)
         request.user.save()
         return Response({'content': True})
+
+class UsernameAvailableView(APIView):
+    permission_classes = (AllowAny, )
+
+    def post(self, request):
+        new_username = request.data['username']
+        try:
+            User.objects.get(username=new_username)
+            return Response({'content': False})
+        except:
+            return Response({'content': True})

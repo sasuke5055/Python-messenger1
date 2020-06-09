@@ -78,7 +78,10 @@ color: white
      <string/>
     </property>
     <property name="text">
-     <string>nazwa</string>
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Wpisz nazwe konwersacji</string>
     </property>
     <property name="clearButtonEnabled">
      <bool>true</bool>

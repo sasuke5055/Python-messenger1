@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Contact, User, UserConversation, Conversation, Message, FriendRequest
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -15,9 +16,9 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = ['user', 'friends']
 
 
-
 class UserConversationSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField('get_conversation_id')
+
     class Meta:
         model = UserConversation
         fields = ['id', 'title', 'count_unread']
@@ -28,6 +29,7 @@ class UserConversationSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     author = UserSerializer()
+
     class Meta:
         model = Message
         fields = ['content', 'timestamp', 'author']
