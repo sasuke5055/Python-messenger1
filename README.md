@@ -35,7 +35,7 @@ Tworzony przez:
 
 ## Opis Aplikacji
 Celem projektu było stworzenie komunikatora opartego o technologię client-server. 
-Backend został stworzony z wykorzystaniem Django, forntend z wykorzystaniem PyQt5. 
+Backend został stworzony z wykorzystaniem Django, frontend z wykorzystaniem PyQt5. 
 
 Komunikacja clienta z serweram odbywała się za pośrednictwem websocketów. 
 
