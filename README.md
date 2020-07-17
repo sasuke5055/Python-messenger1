@@ -20,6 +20,9 @@
 <br/>
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/PyCharm_Logo.svg/1024px-PyCharm_Logo.svg.png" alt="drawing" height=80px/> 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/768px-Visual_Studio_Code_1.35_icon.svg.png" height=80px/> 
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/GitLab_Logo.svg/1108px-GitLab_Logo.svg.png" height=80px/> 
+
+
 
 ## Głowne informacje
 Projekt studencki tworzony w ramach Kursu Wybranego Języka Programowania (Python).
