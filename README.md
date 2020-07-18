@@ -12,8 +12,7 @@
 <br/>
 <img src="https://www.djangoproject.com/m/img/logos/django-logo-negative.png" alt="drawing" height=80px/>
 <img src="https://miro.medium.com/proxy/1*N5Iep1wJY1iXgMzpHxzE8w.png" alt="drawing" height=80px/>
-<img src="https://user-images.githubusercontent.com/6927678/36393573-789e7bc2-15b0-11e8-9a31-49f58e03a5c9.png
-" alt="drawing" height=80px/>
+<img src="https://user-images.githubusercontent.com/6927678/36393573-789e7bc2-15b0-11e8-9a31-49f58e03a5c9.png" alt="drawing" height=80px/>
 <br/>
 <img src="https://tr3.cbsistatic.com/hub/i/r/2016/10/18/831f017c-ee68-4bd6-8a5c-ab31b4d35d6d/resize/1200x/1d727d94737ac8571d079efce9a035af/dockerhero.jpg" alt="drawing" height=80px/>
 <img src="https://openwhisk.apache.org/images/deployments/logo-docker-compose-text.svg" alt="drawing" height=80px/> 
