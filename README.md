@@ -35,6 +35,8 @@ Tworzony przez:
 * [Aleksandra Romanowska]()
 * [Piotr Szymański](https://github.com/PitiMonster)
 
+Oryginalne repo [GitLab](https://gitlab.com/sasuke5055/python-project)
+
 
 ## Opis Aplikacji
 Celem projektu było stworzenie komunikatora opartego o technologię client-server. 
