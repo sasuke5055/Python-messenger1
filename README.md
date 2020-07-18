@@ -1,8 +1,8 @@
 # PeaChat
 ## Spis treści
-* [Technologies](#technologies)
-* [General info](#general-info)
-* [Application description](#application-description)
+* [Technologie](#technologie)
+* [Głowne informacje](#głowne-informacje)
+* [Opis Aplikacji](#opis-aplikacji)
 
 	
 
@@ -28,7 +28,7 @@
 Projekt studencki tworzony w ramach Kursu Wybranego Języka Programowania (Python).
 
 Tworzony przez:
-* [Igor Cichecki]()
+* [Igor Cichecki](https://github.com/regin123)
 * [Michał Janik](https://github.com/mihal09)
 * [Paweł Kubala](https://github.com/Kubciooo)
 * [Maciej Lewandowicz](https://github.com/sasuke5055)
