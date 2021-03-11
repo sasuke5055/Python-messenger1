@@ -7,8 +7,7 @@
 	
 
 ## Technologie
-<img src="https://yourdevops.org/wp-content/uploads/2019/03/python3.jpg" alt="drawing" height=80px/>
-<img src="https://udooorgcdn-aidilabsrl.netdna-ssl.com/wp-content/uploads/2015/05/qt5-udoo.jpg" alt="drawing" height=80px/>
+<img src="https://engineering.fb.com/wp-content/uploads/2016/05/2000px-Python-logo-notext.svg_.png" alt="drawing" height=80px/>
 <br/>
 <img src="https://www.djangoproject.com/m/img/logos/django-logo-negative.png" alt="drawing" height=80px/>
 <img src="https://miro.medium.com/proxy/1*N5Iep1wJY1iXgMzpHxzE8w.png" alt="drawing" height=80px/>
